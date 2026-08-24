@@ -40,6 +40,7 @@
   ],
   "scripts": {
     "build": "tsup",
+    "prepare": "npm run build",
     "generate": "node tools/generate.mjs",
     "specs:fetch": "node tools/fetch-specs.mjs",
     "typecheck": "tsc -p tsconfig.check.json",

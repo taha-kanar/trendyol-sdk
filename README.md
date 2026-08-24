@@ -11,8 +11,17 @@ Typed TypeScript client for the **Trendyol Marketplace Integration API** — all
 
 ## Install
 
+Not published to a registry — install it from the repository:
+
 ```bash
-npm install trendyol-sdk
+npm install github:taha-kanar/trendyol-sdk
+```
+
+Or work on it locally:
+
+```bash
+git clone https://github.com/taha-kanar/trendyol-sdk.git
+cd trendyol-sdk && npm install && npm run build
 ```
 
 ## Quick start
