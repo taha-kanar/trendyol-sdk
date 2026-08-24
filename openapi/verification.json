@@ -1,0 +1,131 @@
+{
+  "observedOn": "2026-08-24",
+  "environment": "production",
+  "note": "Written by `npm run observe -- --write`. Read-only probes only; write endpoints cannot be verified this way — use the drift middleware from `trendyol-sdk/drift` against your own traffic.",
+  "results": {
+    "getClaimIssueReasons": {
+      "status": "matches-spec"
+    },
+    "getClaimItemAudits": {
+      "status": "matches-spec"
+    },
+    "getCountries": {
+      "status": "matches-spec"
+    },
+    "getDistrictsByCity": {
+      "status": "matches-spec"
+    },
+    "getCargoProviders": {
+      "status": "matches-spec"
+    },
+    "getCategoryTree": {
+      "status": "matches-spec"
+    },
+    "getCategoryAttributes": {
+      "status": "matches-spec"
+    },
+    "filterApprovedProductsInventoryAndPrice": {
+      "status": "matches-spec"
+    },
+    "getProductBase": {
+      "status": "matches-spec"
+    },
+    "getUpdateAudits": {
+      "status": "matches-spec"
+    },
+    "getWebhooks": {
+      "status": "matches-spec"
+    },
+    "getOtherFinancials": {
+      "status": "matches-spec"
+    },
+    "getShipmentPackages": {
+      "status": "drifted",
+      "findings": 337
+    },
+    "getShipmentPackagesStream": {
+      "status": "drifted",
+      "findings": 337
+    },
+    "getClaims": {
+      "status": "drifted",
+      "findings": 39
+    },
+    "getCitiesByCountry": {
+      "status": "drifted",
+      "findings": 8
+    },
+    "getTurkeyCities": {
+      "status": "drifted",
+      "findings": 5
+    },
+    "getTurkeyDistricts": {
+      "status": "drifted",
+      "findings": 5
+    },
+    "getTurkeyNeighborhoods": {
+      "status": "drifted",
+      "findings": 5
+    },
+    "getAzerbaijanCities": {
+      "status": "drifted",
+      "findings": 5
+    },
+    "getAzerbaijanDistricts": {
+      "status": "drifted",
+      "findings": 5
+    },
+    "getSuppliersAddresses": {
+      "status": "drifted",
+      "findings": 15
+    },
+    "getBrands": {
+      "status": "drifted",
+      "findings": 5
+    },
+    "getBrandsByName": {
+      "status": "drifted",
+      "findings": 1
+    },
+    "getCategoryAttributeValues": {
+      "status": "drifted",
+      "findings": 5
+    },
+    "filterApprovedProducts": {
+      "status": "drifted",
+      "findings": 41
+    },
+    "filterUnapprovedProducts": {
+      "status": "drifted",
+      "findings": 45
+    },
+    "getQuestionFilter": {
+      "status": "drifted",
+      "findings": 5
+    },
+    "getQuestion": {
+      "status": "drifted",
+      "findings": 1
+    },
+    "getSettlements": {
+      "status": "drifted",
+      "findings": 5
+    },
+    "getCompensationTickets": {
+      "status": "drifted",
+      "findings": 1
+    },
+    "getCargoInvoiceItems": {
+      "status": "not-probed",
+      "reason": "no id available from earlier probes"
+    },
+    "getBatchRequestResult": {
+      "status": "not-probed",
+      "reason": "no id available from earlier probes"
+    },
+    "getCommonLabel": {
+      "status": "failed",
+      "reason": "TrendyolBadRequestError 400"
+    }
+  }
+}

@@ -1,0 +1,270 @@
+{
+  "openapi": "3.0.3",
+  "x-readme": {
+    "proxy-enabled": false
+  },
+  "info": {
+    "title": "Trendyol Express Integration",
+    "description": "Trendyol Express Integration API",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Trendyol Integration Support",
+      "email": "entegrasyon@trendyol.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://apigw.trendyol.com/integration",
+      "description": "Production Environment"
+    },
+    {
+      "url": "https://stageapigw.trendyol.com/integration",
+      "description": "Stage Environment"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Delivery Integration",
+      "description": "Delivery Operations"
+    },
+    {
+      "name": "Delivery Compensation Operations",
+      "description": "Trendyol Express deliveries compensation operations"
+    }
+  ],
+  "paths": {
+    "/tex/compensation/sellers/{sellerId}/tickets": {
+      "get": {
+        "tags": [
+          "Compensation Listing Integration"
+        ],
+        "summary": "Listing compensation requests for Trendyol Express - getCompensationTickets",
+        "description": "Suppliers can track their compensation requests for Trendyol Express deliveries",
+        "operationId": "getCompensationTickets",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Satıcı ID"
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Start Date (Unix timestamp ms)"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "End Date (Unix timestamp ms)"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "description": "Page number"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 200,
+              "maximum": 200
+            },
+            "description": "Page size (max 100)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "totalCount": {
+                      "type": "integer"
+                    },
+                    "data": {
+                      "type": "object",
+                      "items": {
+                        "$ref": "#/components/schemas/CompensationTicket"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Basic Auth with Suppliers API Key ve API Secret"
+      }
+    },
+    "schemas": {
+      "CompensationTicket": {
+        "type": "object",
+        "properties": {
+          "cargoProvider": {
+            "type": "string",
+            "description": "Cargo Provider"
+          },
+          "compensateReason": {
+            "type": "string",
+            "description": "Compensation Reason"
+          },
+          "createDate": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Created Date (Unix timestamp ms)"
+          },
+          "currentState": {
+            "type": "string",
+            "enum": [
+              "Empty",
+              "MarkInCompensation",
+              "OpenedForRefund",
+              "StartCompensationFinanceProgress",
+              "StartCompensationInApprovalProgress",
+              "CompensationApproved",
+              "CompensationRejected",
+              "FoundAfterCompensationComplete",
+              "NotCompensationCase",
+              "FoundInCompensation",
+              "FoundInvestigationProgress",
+              "MarkCompensationCancel",
+              "CreateCompensationTicket",
+              "FinalizeCompensation",
+              "CloseCompensationTicket",
+              "FoundInvestigationProgressDeliveredToCustomer",
+              "FoundInCompensationDeliveredToCustomer",
+              "FoundAfterCompensationCompleteDeliveredToCustomer"
+            ],
+            "description": "State Description\n- Empty (Your compensation claim has been rejected based on the investigations conducted.)\\n\n- MarkInCompensation (Your compensation claim is being reviewed.)\n- OpenedForRefund (Your compensation claim is being reviewed.)\n- StartCompensationFinanceProgress (Your compensation claim has been approved. The amount to be invoiced will be transferred to the Finance > Invoice Listing > Invoices I Need to Issue to Trendyol page within 15 business days at the latest.)\n- StartCompensationInApprovalProgress (Your compensation claim has been approved. The amount to be invoiced will be transferred to the Finance > Invoice Listing > Invoices I Need to Issue to Trendyol page within 15 business days at the latest.)\n- CompensationApproved (Your compensation claim has been approved. The amount to be invoiced will be transferred to the Finance > Invoice Listing > Invoices I Need to Issue to Trendyol page within 15 business days at the latest.)\n- CompensationRejected (Your compensation claim has been approved. The amount to be invoiced will be transferred to the Finance > Invoice Listing > Invoices I Need to Issue to Trendyol page within 15 business days at the latest.)                                  \n- FoundAfterCompensationComplete (Your shipment has been found and will be returned.)\n- NotCompensationCase (Your compensation claim has been rejected based on the investigations conducted.)\n- FoundInCompensation (Your shipment has been found and will be returned.)\n- FoundInvestigationProgress (Your shipment has been found and will be returned.)\n- MarkCompensationCancel (Your compensation claim has been rejected based on the investigations conducted.)\n- CreateCompensationTicket (Your compensation claim is being reviewed.)\n- FinalizeCompensation (Your compensation claim has been approved. The amount to be invoiced will be transferred to the Finance > Invoice Listing > Invoices I Need to Issue to Trendyol page within 15 business days at the latest.)\n- CloseCompensationTicket (Your shipment has been found and will be returned.)\n- FoundInvestigationProgressDeliveredToCustomer (Your shipment has been found and will be delivered to the customer.)\n- FoundInCompensationDeliveredToCustomer (Your shipment has been found and will be delivered to the customer.)\n- FoundAfterCompensationCompleteDeliveredToCustomer (Your shipment has been found and will be delivered to the customer.)            \n"
+          },
+          "deliveryNumber": {
+            "type": "string",
+            "description": "Delivery Number"
+          },
+          "itemDetails": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompensationItemDetail"
+            }
+          },
+          "orderNumber": {
+            "type": "string",
+            "description": "Order Number"
+          },
+          "requestedBy": {
+            "type": "string",
+            "description": "The person who submitted the request"
+          },
+          "stateMessage": {
+            "type": "string",
+            "description": "State Message"
+          },
+          "totalItemsAmount": {
+            "type": "string",
+            "description": "Total Amount"
+          }
+        }
+      },
+      "CompensationItemDetail": {
+        "type": "object",
+        "properties": {
+          "itemAmount": {
+            "type": "number",
+            "format": "float",
+            "description": "Amount"
+          },
+          "itemCode": {
+            "type": "string",
+            "description": "Item Code"
+          },
+          "itemCount": {
+            "type": "integer",
+            "description": "Count"
+          },
+          "itemName": {
+            "type": "string",
+            "description": "Name"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}

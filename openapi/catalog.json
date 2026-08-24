@@ -1,0 +1,831 @@
+[
+  {
+    "module": "cargo-invoice",
+    "title": "Trendyol Domestic Cargo Invoice Details Integration",
+    "servers": [
+      "https://apigw.trendyol.com/integration/finance/che",
+      "https://stageapigw.trendyol.com/integration/finance/che"
+    ],
+    "operations": [
+      {
+        "operationId": "getCargoInvoiceItems",
+        "method": "GET",
+        "path": "/sellers/{sellerId}/cargo-invoice/{invoiceSerialNumber}/items",
+        "tags": [
+          "Cargo Invoice"
+        ],
+        "summary": "Get Cargo Invoice Details"
+      }
+    ]
+  },
+  {
+    "module": "common-label",
+    "title": "Trendyol Marketplace Integration - Common Label Barcode Integration",
+    "servers": [
+      "https://apigw.trendyol.com/integration",
+      "https://stageapigw.trendyol.com/integration"
+    ],
+    "operations": [
+      {
+        "operationId": "getCommonLabel",
+        "method": "GET",
+        "path": "/sellers/{sellerId}/common-label/{cargoTrackingNumber}",
+        "tags": [
+          "Common Label Barcode Get Integration"
+        ],
+        "summary": "Get Common Label Barcode - getCommonLabel"
+      },
+      {
+        "operationId": "createCommonLabel",
+        "method": "POST",
+        "path": "/sellers/{sellerId}/common-label/{cargoTrackingNumber}",
+        "tags": [
+          "Common Label Barcode Create Integration"
+        ],
+        "summary": "Create Common Label Barcode - createCommonLabel"
+      }
+    ]
+  },
+  {
+    "module": "express",
+    "title": "Trendyol Express Integration",
+    "servers": [
+      "https://apigw.trendyol.com/integration",
+      "https://stageapigw.trendyol.com/integration"
+    ],
+    "operations": [
+      {
+        "operationId": "getCompensationTickets",
+        "method": "GET",
+        "path": "/tex/compensation/sellers/{sellerId}/tickets",
+        "tags": [
+          "Compensation Listing Integration"
+        ],
+        "summary": "Listing compensation requests for Trendyol Express - getCompensationTickets"
+      }
+    ]
+  },
+  {
+    "module": "finance",
+    "title": "Trendyol Domestic Current Account Statement Integration",
+    "servers": [
+      "https://apigw.trendyol.com/integration/finance/che",
+      "https://stageapigw.trendyol.com/integration/finance/che"
+    ],
+    "operations": [
+      {
+        "operationId": "getSettlements",
+        "method": "GET",
+        "path": "/sellers/{sellerId}/settlements",
+        "tags": [
+          "Settlements"
+        ],
+        "summary": "Get Settlements (Sales, Returns, Discounts, Coupons, Provisions)"
+      },
+      {
+        "operationId": "getOtherFinancials",
+        "method": "GET",
+        "path": "/sellers/{sellerId}/otherfinancials",
+        "tags": [
+          "Other Financials"
+        ],
+        "summary": "Get Other Financials (Supplier financing, transfers, payments, invoices, etc.)"
+      }
+    ]
+  },
+  {
+    "module": "invoice",
+    "title": "Invoice Integration",
+    "servers": [
+      "https://apigw.trendyol.com/integration",
+      "https://stageapigw.trendyol.com/integration"
+    ],
+    "operations": [
+      {
+        "operationId": "sendInvoiceLink",
+        "method": "POST",
+        "path": "/sellers/{sellerId}/seller-invoice-links",
+        "tags": [
+          "Invoice Link Management"
+        ],
+        "summary": "Send Customer Invoice Link - sendInvoiceLink"
+      },
+      {
+        "operationId": "deleteInvoiceLink",
+        "method": "POST",
+        "path": "/sellers/{sellerId}/seller-invoice-links/delete",
+        "tags": [
+          "Invoice Link Management"
+        ],
+        "summary": "Delete Customer Invoice Link - deleteInvoiceLink"
+      },
+      {
+        "operationId": "uploadInvoiceFile",
+        "method": "POST",
+        "path": "/sellers/{sellerId}/seller-invoice-file",
+        "tags": [
+          "Invoice File Management"
+        ],
+        "summary": "Send Customer Invoice File - uploadInvoiceFile"
+      }
+    ]
+  },
+  {
+    "module": "marketplace",
+    "title": "Trendyol Marketplace Integration",
+    "servers": [
+      "https://apigw.trendyol.com/integration",
+      "https://stageapigw.trendyol.com/integration"
+    ],
+    "operations": [
+      {
+        "operationId": "getShipmentPackages",
+        "method": "GET",
+        "path": "/order/sellers/{sellerId}/orders",
+        "tags": [
+          "Order Integration"
+        ],
+        "summary": "Get Order Packages - getShipmentPackages"
+      },
+      {
+        "operationId": "getShipmentPackagesStream",
+        "method": "GET",
+        "path": "/order/sellers/{sellerId}/orders/stream",
+        "tags": [
+          "Order Integration"
+        ],
+        "summary": "Get Shipment Packages via Stream - getShipmentPackagesStream"
+      },
+      {
+        "operationId": "updatePackageStatus",
+        "method": "PUT",
+        "path": "/order/sellers/{sellerId}/shipment-packages/{packageId}",
+        "tags": [
+          "Order Integration"
+        ],
+        "summary": "Notify Packages - updatePackage"
+      },
+      {
+        "operationId": "cancelOrderPackageItem",
+        "method": "PUT",
+        "path": "/order/sellers/{sellerId}/shipment-packages/{packageId}/items/unsupplied",
+        "tags": [
+          "Order Integration"
+        ],
+        "summary": "Cancel Order Package Item - updatePackage"
+      },
+      {
+        "operationId": "splitMultiPackagesByQuantity",
+        "method": "POST",
+        "path": "/order/sellers/{sellerId}/shipment-packages/{packageId}/split-packages",
+        "tags": [
+          "Split Order Package"
+        ],
+        "summary": "Split Order Packages with Multiple Barcodes - splitMultiPackageByQuantity"
+      },
+      {
+        "operationId": "splitShipmentPackage",
+        "method": "POST",
+        "path": "/order/sellers/{sellerId}/shipment-packages/{packageId}/split",
+        "tags": [
+          "Split Order Package"
+        ],
+        "summary": "Split Shipment Package - splitShipmentPackage"
+      },
+      {
+        "operationId": "splitShipmentPackageByQuantity",
+        "method": "POST",
+        "path": "/order/sellers/{sellerId}/shipment-packages/{packageId}/quantity-split",
+        "tags": [
+          "Split Order Package"
+        ],
+        "summary": "Split Packages Based On Barcode - splitShipmentPackageByQuantity"
+      },
+      {
+        "operationId": "multiSplitShipmentPackage",
+        "method": "POST",
+        "path": "/order/sellers/{sellerId}/shipment-packages/{packageId}/multi-split",
+        "tags": [
+          "Split Order Package"
+        ],
+        "summary": "Split Multiple Packages - multiSplitShipmentPackage"
+      },
+      {
+        "operationId": "updateBoxInfo",
+        "method": "PUT",
+        "path": "/order/sellers/{sellerId}/shipment-packages/{packageId}/box-info",
+        "tags": [
+          "Order Integration"
+        ],
+        "summary": "Notify Deci and Box Quantity - updateBoxInfo"
+      },
+      {
+        "operationId": "processAlternativeDelivery",
+        "method": "PUT",
+        "path": "/order/sellers/{sellerId}/shipment-packages/{packageId}/alternative-delivery",
+        "tags": [
+          "Shipping Alternative Delivery"
+        ],
+        "summary": "Shipping with Cargo Link - processAlternativeDelivery"
+      },
+      {
+        "operationId": "processAlternativeDeliveryDigital",
+        "method": "PUT",
+        "path": "/order/sellers/{sellerId}/shipment-packages/{packageId}/alternative-delivery-digital",
+        "tags": [
+          "Shipping Alternative Delivery"
+        ],
+        "summary": "Digital Product Delivery with Alternative Delivery - processAlternativeDelivery"
+      },
+      {
+        "operationId": "manualDeliverByPackageId",
+        "method": "PUT",
+        "path": "/order/sellers/{sellerId}/shipment-packages/{packageId}/manual-invoice-delivery",
+        "tags": [
+          "Shipping Alternative Delivery"
+        ],
+        "summary": "Manual Delivery by Package Id - manualDeliverByPackageId"
+      },
+      {
+        "operationId": "manualDeliverByTrackingNumber",
+        "method": "PUT",
+        "path": "/order/sellers/{sellerId}/shipment-packages/manual-invoice-delivery-by-tracking-number/{cargoTrackingNumber}",
+        "tags": [
+          "Shipping Alternative Delivery"
+        ],
+        "summary": "Manual Delivery by Tracking Number - manualDeliverByTrackingNumber"
+      },
+      {
+        "operationId": "manualReturnByTrackingNumber",
+        "method": "PUT",
+        "path": "/order/sellers/{sellerId}/shipment-packages/manual-return-by-tracking-number/{cargoTrackingNumber}",
+        "tags": [
+          "Shipping Alternative Delivery"
+        ],
+        "summary": "Manual Return by Tracking Number - manualReturnByTrackingNumber"
+      },
+      {
+        "operationId": "manualReturnByPackageId",
+        "method": "PUT",
+        "path": "/order/sellers/{sellerId}/shipment-packages/{packageId}/manual-return",
+        "tags": [
+          "Shipping Alternative Delivery"
+        ],
+        "summary": "Manual Return by Package Id - manualReturnByPackageId"
+      },
+      {
+        "operationId": "deliveredByService",
+        "method": "PUT",
+        "path": "/order/sellers/{sellerId}/shipment-packages/{packageId}/delivered-by-service",
+        "tags": [
+          "Order Integration"
+        ],
+        "summary": "Delivery By Service - deliveredByService"
+      },
+      {
+        "operationId": "changeCargoProvider",
+        "method": "PUT",
+        "path": "/order/sellers/{sellerId}/shipment-packages/{packageId}/cargo-providers",
+        "tags": [
+          "Order Integration"
+        ],
+        "summary": "Change Cargo Provider - changeCargoProvider"
+      },
+      {
+        "operationId": "updateWarehouse",
+        "method": "PUT",
+        "path": "/order/sellers/{sellerId}/shipment-packages/{packageId}/warehouse",
+        "tags": [
+          "Order Integration"
+        ],
+        "summary": "Update Warehouse Information - updateWarehouse"
+      },
+      {
+        "operationId": "extendAgreedDeliveryDate",
+        "method": "PUT",
+        "path": "/order/sellers/{sellerId}/shipment-packages/{packageId}/extended-agreed-delivery-date",
+        "tags": [
+          "Order Integration"
+        ],
+        "summary": "Additional Supply Time Definition - agreedDeliveryDate"
+      },
+      {
+        "operationId": "getCountries",
+        "method": "GET",
+        "path": "/member/countries",
+        "tags": [
+          "Address Information"
+        ],
+        "summary": "Country Information"
+      },
+      {
+        "operationId": "getCitiesByCountry",
+        "method": "GET",
+        "path": "/member/countries/{CountryCode}/cities",
+        "tags": [
+          "Address Information"
+        ],
+        "summary": "Get Cities for GULF and CEE Countries"
+      },
+      {
+        "operationId": "getDistrictsByCity",
+        "method": "GET",
+        "path": "/member/countries/{CountryCode}/cities/{cityId}/districts",
+        "tags": [
+          "Address Information"
+        ],
+        "summary": "Get Districts for GULF Countries"
+      },
+      {
+        "operationId": "getAzerbaijanCities",
+        "method": "GET",
+        "path": "/member/countries/domestic/AZ/cities",
+        "tags": [
+          "Address Information"
+        ],
+        "summary": "Get Cities for Azerbaijan"
+      },
+      {
+        "operationId": "getAzerbaijanDistricts",
+        "method": "GET",
+        "path": "/member/countries/domestic/AZ/cities/{cityCode}/districts",
+        "tags": [
+          "Address Information"
+        ],
+        "summary": "Get Districts for Azerbaijan"
+      },
+      {
+        "operationId": "getTurkeyCities",
+        "method": "GET",
+        "path": "/member/countries/domestic/TR/cities",
+        "tags": [
+          "Address Information"
+        ],
+        "summary": "Get Cities for Turkey"
+      },
+      {
+        "operationId": "getTurkeyDistricts",
+        "method": "GET",
+        "path": "/member/countries/domestic/TR/cities/{CityCode}/districts",
+        "tags": [
+          "Address Information"
+        ],
+        "summary": "Get Districts for Turkey"
+      },
+      {
+        "operationId": "getTurkeyNeighborhoods",
+        "method": "GET",
+        "path": "/member/countries/domestic/TR/cities/{CityCode}/districts/{DistrictCode}/neighborhoods",
+        "tags": [
+          "Address Information"
+        ],
+        "summary": "Get Neighborhoods for Turkey"
+      },
+      {
+        "operationId": "updateLaborCosts",
+        "method": "PUT",
+        "path": "/order/sellers/{sellerId}/shipment-packages/{packageId}/labor-costs",
+        "tags": [
+          "Order Integration"
+        ],
+        "summary": "Update Labor Cost - laborCosts"
+      },
+      {
+        "operationId": "getClaims",
+        "method": "GET",
+        "path": "/order/sellers/{sellerId}/claims",
+        "tags": [
+          "Returned Orders Integration"
+        ],
+        "summary": "Getting Returned Orders - getClaims"
+      },
+      {
+        "operationId": "createClaim",
+        "method": "POST",
+        "path": "/order/sellers/{sellerId}/claims/create",
+        "tags": [
+          "Returned Orders Integration"
+        ],
+        "summary": "Create a Return Request - createClaim"
+      },
+      {
+        "operationId": "approveClaimLineItems",
+        "method": "PUT",
+        "path": "/order/sellers/{sellerId}/claims/{claimId}/items/approve",
+        "tags": [
+          "Returned Orders Integration"
+        ],
+        "summary": "Approve Returned Orders - approveClaimLineItems"
+      },
+      {
+        "operationId": "createClaimIssue",
+        "method": "POST",
+        "path": "/order/sellers/{sellerId}/claims/{claimId}/issue",
+        "tags": [
+          "Returned Orders Integration"
+        ],
+        "summary": "Create a Rejection Request on Returned Orders - createClaimIssue"
+      },
+      {
+        "operationId": "getClaimIssueReasons",
+        "method": "GET",
+        "path": "/order/claim-issue-reasons",
+        "tags": [
+          "Returned Orders Integration"
+        ],
+        "summary": "Claim Issue Reasons - getClaimIssueReasons"
+      },
+      {
+        "operationId": "getClaimItemAudits",
+        "method": "GET",
+        "path": "/order/sellers/{sellerId}/claims/items/{claimItemsId}/audit",
+        "tags": [
+          "Returned Orders Integration"
+        ],
+        "summary": "Get Claim Audit Information - getClaimItemAudits"
+      }
+    ]
+  },
+  {
+    "module": "product",
+    "title": "Trendyol International Marketplace - Product Integration API",
+    "servers": [
+      "https://apigw.trendyol.com/integration",
+      "https://stageapigw.trendyol.com/integration"
+    ],
+    "operations": [
+      {
+        "operationId": "getBrands",
+        "method": "GET",
+        "path": "/product/brands",
+        "tags": [
+          "Brands"
+        ],
+        "summary": "Brand List (getBrands)"
+      },
+      {
+        "operationId": "getBrandsByName",
+        "method": "GET",
+        "path": "/product/brands/by-name",
+        "tags": [
+          "Brands"
+        ],
+        "summary": "Brand Search (getBrandsByName)"
+      },
+      {
+        "operationId": "createBrand",
+        "method": "POST",
+        "path": "/product/sellers/{sellerId}/brands",
+        "tags": [
+          "Brands"
+        ],
+        "summary": "Brand Creation Service (createBrand)"
+      },
+      {
+        "operationId": "getCategoryTree",
+        "method": "GET",
+        "path": "/product/product-categories",
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Category List (getCategoryTree)"
+      },
+      {
+        "operationId": "getCategoryAttributes",
+        "method": "GET",
+        "path": "/product/categories/{categoryId}/attributes",
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Category Attribute List (getCategoryAttributes)"
+      },
+      {
+        "operationId": "getCategoryAttributeValues",
+        "method": "GET",
+        "path": "/product/categories/{categoryId}/attributes/{attributeId}/values",
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Category Attribute Values List (getCategoryAttributeValues)"
+      },
+      {
+        "operationId": "createProducts",
+        "method": "POST",
+        "path": "/product/sellers/{sellerId}/v2/products",
+        "tags": [
+          "Products"
+        ],
+        "summary": "Product Creation V2 (createProducts)"
+      },
+      {
+        "operationId": "getProductBase",
+        "method": "GET",
+        "path": "/product/sellers/{sellerId}/product/{barcode}",
+        "tags": [
+          "Products"
+        ],
+        "summary": "Product Filtering - Basic Information (getProductBase)"
+      },
+      {
+        "operationId": "filterUnapprovedProducts",
+        "method": "GET",
+        "path": "/product/sellers/{sellerId}/products/unapproved",
+        "tags": [
+          "Products"
+        ],
+        "summary": "Product Filtering - Unapproved Products (filterUnapprovedProducts)"
+      },
+      {
+        "operationId": "filterApprovedProducts",
+        "method": "GET",
+        "path": "/product/sellers/{sellerId}/products/approved",
+        "tags": [
+          "Products"
+        ],
+        "summary": "Product Filtering - Approved Products (filterApprovedProducts)"
+      },
+      {
+        "operationId": "filterApprovedProductsInventoryAndPrice",
+        "method": "GET",
+        "path": "/product/sellers/{sellerId}/products/approved/inventory-and-price",
+        "tags": [
+          "Products"
+        ],
+        "summary": "Product Filtering - Approved Products Stock and Price (filterApprovedProductsInventoryAndPrice)"
+      },
+      {
+        "operationId": "deleteProducts",
+        "method": "DELETE",
+        "path": "/product/sellers/{sellerId}/products",
+        "tags": [
+          "Products"
+        ],
+        "summary": "Product Deletion (deleteProducts)"
+      },
+      {
+        "operationId": "archiveProducts",
+        "method": "PUT",
+        "path": "/product/sellers/{sellerId}/products/archive-state",
+        "tags": [
+          "Products"
+        ],
+        "summary": "Product Archiving (archiveProducts)"
+      },
+      {
+        "operationId": "getBuyboxInformation",
+        "method": "POST",
+        "path": "/product/sellers/{sellerId}/products/buybox-information",
+        "tags": [
+          "Products"
+        ],
+        "summary": "Product Buybox Check Service (getBuyboxInformation)"
+      },
+      {
+        "operationId": "unlockProducts",
+        "method": "PUT",
+        "path": "/product/sellers/{sellerId}/products/unlock",
+        "tags": [
+          "Products"
+        ],
+        "summary": "Product Unlock Service (unlockProducts)"
+      },
+      {
+        "operationId": "updateUnapprovedProducts",
+        "method": "POST",
+        "path": "/product/sellers/{sellerId}/products/unapproved-bulk-update",
+        "tags": [
+          "Updates"
+        ],
+        "summary": "Product Update - Unapproved Products (updateUnapprovedProducts)"
+      },
+      {
+        "operationId": "updateContentBulk",
+        "method": "POST",
+        "path": "/product/sellers/{sellerId}/products/content-bulk-update",
+        "tags": [
+          "Updates"
+        ],
+        "summary": "Product Update - Approved Content (updateContentBulk)"
+      },
+      {
+        "operationId": "updateVariantBulk",
+        "method": "POST",
+        "path": "/product/sellers/{sellerId}/products/variant-bulk-update",
+        "tags": [
+          "Updates"
+        ],
+        "summary": "Product Update - Approved Variant (updateVariantBulk)"
+      },
+      {
+        "operationId": "updateDeliveryInfoBulk",
+        "method": "POST",
+        "path": "/product/sellers/{sellerId}/products/delivery-info-bulk-update",
+        "tags": [
+          "Updates"
+        ],
+        "summary": "Product Update - Delivery Information (updateDeliveryInfoBulk)"
+      },
+      {
+        "operationId": "getUpdateAudits",
+        "method": "GET",
+        "path": "/product/sellers/{sellerId}/products/{contentId}/update-audits",
+        "tags": [
+          "Updates"
+        ],
+        "summary": "Product Information Update Result Check Service (getUpdateAudits)"
+      },
+      {
+        "operationId": "updatePriceAndInventory",
+        "method": "POST",
+        "path": "/inventory/sellers/{sellerId}/products/price-and-inventory",
+        "tags": [
+          "Inventory"
+        ],
+        "summary": "Stock and Price Update (updatePriceAndInventory)"
+      },
+      {
+        "operationId": "getBatchRequestResult",
+        "method": "GET",
+        "path": "/product/sellers/{sellerId}/products/batch-requests/{batchRequestId}",
+        "tags": [
+          "BatchRequests"
+        ],
+        "summary": "Batch Request Status Check (getBatchRequestResult)"
+      },
+      {
+        "operationId": "getCargoProviders",
+        "method": "GET",
+        "path": "/product/lookup/cargo-providers",
+        "tags": [
+          "Lookup"
+        ],
+        "summary": "Cargo Provider Filtering Service (getCargoProviders)"
+      }
+    ]
+  },
+  {
+    "module": "question",
+    "title": "Trendyol Marketplace - Customer Question Integration",
+    "servers": [
+      "https://apigw.trendyol.com/integration",
+      "https://stageapigw.trendyol.com/integration"
+    ],
+    "operations": [
+      {
+        "operationId": "getQuestionFilter",
+        "method": "GET",
+        "path": "/qna/sellers/{sellerId}/questions/filter",
+        "tags": [
+          "Customer Question Integration"
+        ],
+        "summary": "Filter Customer Questions"
+      },
+      {
+        "operationId": "createQuestion",
+        "method": "POST",
+        "path": "/qna/sellers/{sellerId}/questions",
+        "tags": [
+          "Customer Question Integration"
+        ],
+        "summary": "Create Question"
+      },
+      {
+        "operationId": "getQuestion",
+        "method": "GET",
+        "path": "/qna/sellers/{sellerId}/questions/{id}",
+        "tags": [
+          "Customer Question Integration"
+        ],
+        "summary": "Get Question Detail"
+      },
+      {
+        "operationId": "answerQuestion",
+        "method": "POST",
+        "path": "/qna/sellers/{sellerId}/questions/{id}/answers",
+        "tags": [
+          "Customer Question Integration"
+        ],
+        "summary": "Answer Question"
+      }
+    ]
+  },
+  {
+    "module": "supplier-address",
+    "title": "Trendyol Marketplace - Supplier Information Integration",
+    "servers": [
+      "https://apigw.trendyol.com/integration",
+      "https://stageapigw.trendyol.com/integration"
+    ],
+    "operations": [
+      {
+        "operationId": "getSuppliersAddresses",
+        "method": "GET",
+        "path": "/sellers/{sellerId}/addresses",
+        "tags": [
+          "Supplier Information Integration"
+        ],
+        "summary": "Return, Shipment and Invoice Address Information - getSuppliersAddresses"
+      }
+    ]
+  },
+  {
+    "module": "test-order",
+    "title": "Trendyol Test Order API",
+    "servers": [
+      "https://stageapigw.trendyol.com/integration"
+    ],
+    "operations": [
+      {
+        "operationId": "createTestOrder",
+        "method": "POST",
+        "path": "/test/order/orders/core",
+        "tags": [
+          "Test Orders"
+        ],
+        "summary": "Create Test Order"
+      },
+      {
+        "operationId": "updateTestOrderStatus",
+        "method": "PUT",
+        "path": "/test/order/sellers/{sellerId}/shipment-packages/{packageId}/status",
+        "tags": [
+          "Test Orders"
+        ],
+        "summary": "Update Test Order Status"
+      },
+      {
+        "operationId": "updateTestClaimToWaitingInAction",
+        "method": "PUT",
+        "path": "/test/order/sellers/{sellerId}/claims/waiting-in-action",
+        "tags": [
+          "Test Orders"
+        ],
+        "summary": "Update Return Test Orders to WaitingInAction Status"
+      }
+    ]
+  },
+  {
+    "module": "webhook",
+    "title": "Trendyol Webhook API",
+    "servers": [
+      "https://apigw.trendyol.com/integration/webhook",
+      "https://stageapigw.trendyol.com/integration/webhook"
+    ],
+    "operations": [
+      {
+        "operationId": "getWebhooks",
+        "method": "GET",
+        "path": "/sellers/{sellerId}/webhooks",
+        "tags": [
+          "Webhook"
+        ],
+        "summary": "List Webhooks - getWebhook"
+      },
+      {
+        "operationId": "createWebhook",
+        "method": "POST",
+        "path": "/sellers/{sellerId}/webhooks",
+        "tags": [
+          "Webhook"
+        ],
+        "summary": "Create Webhook - createWebhook"
+      },
+      {
+        "operationId": "updateWebhook",
+        "method": "PUT",
+        "path": "/sellers/{sellerId}/webhooks/{Id}",
+        "tags": [
+          "Webhook"
+        ],
+        "summary": "Update Webhook - updateWebhook"
+      },
+      {
+        "operationId": "deleteWebhook",
+        "method": "DELETE",
+        "path": "/sellers/{sellerId}/webhooks/{Id}",
+        "tags": [
+          "Webhook"
+        ],
+        "summary": "Delete Webhook - deleteWebhook"
+      },
+      {
+        "operationId": "activateWebhook",
+        "method": "PUT",
+        "path": "/sellers/{sellerId}/webhooks/{Id}/activate",
+        "tags": [
+          "Webhook"
+        ],
+        "summary": "Activate Webhook - activate"
+      },
+      {
+        "operationId": "deactivateWebhook",
+        "method": "PUT",
+        "path": "/sellers/{sellerId}/webhooks/{Id}/deactivate",
+        "tags": [
+          "Webhook"
+        ],
+        "summary": "Deactivate Webhook - deactivate"
+      }
+    ]
+  }
+]

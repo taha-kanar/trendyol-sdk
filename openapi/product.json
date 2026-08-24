@@ -1,0 +1,3050 @@
+{
+  "openapi": "3.0.3",
+  "x-readme": {
+    "proxy-enabled": false
+  },
+  "info": {
+    "title": "Trendyol International Marketplace - Product Integration API",
+    "description": "Trendyol International Marketplace product integration API services for non-TR sellers. Covers product creation (V2), filtering, updating, deletion, archiving, stock-price updating, buybox, unlock, and batch request tracking services.\n",
+    "version": "2.0.0",
+    "contact": {
+      "name": "Trendyol Integration Support",
+      "email": "entegrasyon@trendyol.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://apigw.trendyol.com/integration",
+      "description": "Production"
+    },
+    {
+      "url": "https://stageapigw.trendyol.com/integration",
+      "description": "Stage"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Brands",
+      "description": "Brand listing services"
+    },
+    {
+      "name": "Categories",
+      "description": "Category, attribute, and attribute value services"
+    },
+    {
+      "name": "Products",
+      "description": "Product creation, filtering, deletion, archiving, buybox, and unlock services"
+    },
+    {
+      "name": "Updates",
+      "description": "Product update services (approved/unapproved)"
+    },
+    {
+      "name": "Inventory",
+      "description": "Stock and price update services"
+    },
+    {
+      "name": "BatchRequests",
+      "description": "Batch request tracking services"
+    },
+    {
+      "name": "Lookup",
+      "description": "Cargo provider listing services"
+    }
+  ],
+  "paths": {
+    "/product/brands": {
+      "get": {
+        "tags": [
+          "Brands"
+        ],
+        "summary": "Brand List (getBrands)",
+        "description": "The brandId to be sent in createProduct requests is retrieved using this service. A minimum of 1000 brand records can be retrieved per page.\n",
+        "operationId": "getBrands",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number indicating which page of brands to retrieve",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Number of brands to include in a single response",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrandsResponse"
+                },
+                "example": {
+                  "brands": [
+                    {
+                      "id": 10,
+                      "name": "TrendyolMilla"
+                    },
+                    {
+                      "id": 19,
+                      "name": "Milla"
+                    },
+                    {
+                      "id": 20,
+                      "name": "Trendyol"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/product/brands/by-name": {
+      "get": {
+        "tags": [
+          "Brands"
+        ],
+        "summary": "Brand Search (getBrandsByName)",
+        "description": "Search brands by name. Note that the search is case-sensitive.",
+        "operationId": "getBrandsByName",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": true,
+            "description": "Brand name to search for (case-sensitive)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Brand"
+                  }
+                },
+                "example": [
+                  {
+                    "id": 40,
+                    "name": "TRENDYOLMİLLA"
+                  }
+                ]
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/product/sellers/{sellerId}/brands": {
+      "post": {
+        "tags": [
+          "Brands"
+        ],
+        "summary": "Brand Creation Service (createBrand)",
+        "description": "Used to create brands that are not present in the Trendyol Brand List. The request is sent as form-data instead of a JSON body. The brand name must be sent as text in the \"name\" field, and the brand images must be sent as files in the \"images\" field. A minimum of 1 and a maximum of 3 images can be sent.\n",
+        "operationId": "createBrand",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sellerId"
+          },
+          {
+            "name": "storeFrontCode",
+            "in": "header",
+            "required": true,
+            "description": "Country code the brand will be created for (TR for Türkiye)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBrandRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Brand created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateBrandResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/product/product-categories": {
+      "get": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Category List (getCategoryTree)",
+        "description": "The categoryId to be sent in createProduct requests is retrieved using this service. The lowest-level (leaf) category ID must be used. The category tree is updated periodically; it is recommended to fetch the latest list on a weekly basis.\n",
+        "operationId": "getCategoryTree",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Category name filter. Returns categories at every level whose name contains the given keyword.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/storefrontcode"
+          },
+          {
+            "$ref": "#/components/parameters/acceptLanguage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Category"
+                  }
+                },
+                "example": [
+                  {
+                    "id": 1162,
+                    "name": "Atkı & Bere & Eldiven",
+                    "parentId": 368,
+                    "subCategories": [
+                      {
+                        "id": 382,
+                        "name": "Atkı",
+                        "parentId": 1162,
+                        "subCategories": []
+                      },
+                      {
+                        "id": 384,
+                        "name": "Bere",
+                        "parentId": 1162,
+                        "subCategories": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/product/categories/{categoryId}/attributes": {
+      "get": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Category Attribute List (getCategoryAttributes)",
+        "description": "The attributes information to be sent in the Product Creation request is retrieved using this service. The allowMultipleAttributeValues field indicates whether multiple values are supported. The lowest-level (leaf) category ID must be used.\n",
+        "operationId": "getCategoryAttributes",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "path",
+            "required": true,
+            "description": "Trendyol category ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "required",
+            "in": "query",
+            "description": "When true, only required attributes are returned; when false, only non-required attributes are returned. If omitted, all attributes are returned.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/storefrontcode"
+          },
+          {
+            "$ref": "#/components/parameters/acceptLanguage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryAttributesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/product/categories/{categoryId}/attributes/{attributeId}/values": {
+      "get": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Category Attribute Values List (getCategoryAttributeValues)",
+        "description": "The attribute values information to be sent in the Product Creation request is retrieved using this service.\n",
+        "operationId": "getCategoryAttributeValues",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "path",
+            "required": true,
+            "description": "Trendyol category ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "attributeId",
+            "in": "path",
+            "required": true,
+            "description": "Attribute ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (max 1000)",
+            "schema": {
+              "type": "integer",
+              "maximum": 1000
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Maximum number of items per page (max 1000)",
+            "schema": {
+              "type": "integer",
+              "maximum": 1000
+            }
+          },
+          {
+            "$ref": "#/components/parameters/storefrontcode"
+          },
+          {
+            "$ref": "#/components/parameters/acceptLanguage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttributeValuesPageResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/product/sellers/{sellerId}/v2/products": {
+      "post": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Product Creation V2 (createProducts)",
+        "description": "Uploads products to the Trendyol system. In the attribute structure, attributeValueIds (array) or attributeValue (string) is used. The maximum number of items per request is 1,000. listPrice cannot be less than salePrice. The operation is asynchronous; the result should be checked using the returned batchRequestId.\n",
+        "operationId": "createProducts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sellerId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProductsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request has been queued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchRequestResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/product/sellers/{sellerId}/product/{barcode}": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Product Filtering - Basic Information (getProductBase)",
+        "description": "Returns the basic status information of your product in your Trendyol store.",
+        "operationId": "getProductBase",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sellerId"
+          },
+          {
+            "name": "barcode",
+            "in": "path",
+            "required": true,
+            "description": "Product barcode",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductBaseResponse"
+                },
+                "example": {
+                  "barcode": "smoketest-250049",
+                  "approved": true,
+                  "approvedDate": 1763622556000,
+                  "archived": false,
+                  "listingId": "a089a30ed1632032913b28099e49d948",
+                  "contentId": 9511264
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/product/sellers/{sellerId}/products/unapproved": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Product Filtering - Unapproved Products (filterUnapprovedProducts)",
+        "description": "Lists unapproved (draft) products in your Trendyol store. Includes products pending approval and rejected products. nextPageToken is used when there are more than 10,000 unapproved barcodes. page x size can be at most 10,000.\n",
+        "operationId": "filterUnapprovedProducts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sellerId"
+          },
+          {
+            "name": "barcode",
+            "in": "query",
+            "description": "Single barcode query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "Start date (timestamp)",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "description": "End date (timestamp)",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "dateQueryType",
+            "in": "query",
+            "description": "Date filter type",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "CREATED_DATE",
+                "LAST_MODIFIED_DATE"
+              ]
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Items per page (max 1000)",
+            "schema": {
+              "type": "integer",
+              "maximum": 1000
+            }
+          },
+          {
+            "name": "supplierId",
+            "in": "query",
+            "description": "Supplier ID",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "stockCode",
+            "in": "query",
+            "description": "Stock code",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productMainId",
+            "in": "query",
+            "description": "Main product code",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "brandIds",
+            "in": "query",
+            "description": "List of brand IDs",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Product approval status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "rejected",
+                "pendingApproval"
+              ]
+            }
+          },
+          {
+            "name": "nextPageToken",
+            "in": "query",
+            "description": "Next page token when there are more than 10,000 products",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnapprovedProductsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/product/sellers/{sellerId}/products/approved": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Product Filtering - Approved Products (filterApprovedProducts)",
+        "description": "Lists approved products in your Trendyol store. Returns data in a content-based structure; each content contains a variants array. nextPageToken is used when there are more than 10,000 content items. page x size can be at most 10,000.\n",
+        "operationId": "filterApprovedProducts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sellerId"
+          },
+          {
+            "name": "barcode",
+            "in": "query",
+            "description": "Single barcode query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "Start date (timestamp)",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "description": "End date (timestamp)",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "dateQueryType",
+            "in": "query",
+            "description": "Date filter type",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "VARIANT_CREATED_DATE",
+                "VARIANT_MODIFIED_DATE",
+                "CONTENT_MODIFIED_DATE"
+              ]
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Items per page (max 100)",
+            "schema": {
+              "type": "integer",
+              "maximum": 100
+            }
+          },
+          {
+            "name": "supplierId",
+            "in": "query",
+            "description": "Supplier ID",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "stockCode",
+            "in": "query",
+            "description": "Stock code",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productMainId",
+            "in": "query",
+            "description": "Main product code",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "brandIds",
+            "in": "query",
+            "description": "List of brand IDs",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Product status filter",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "archived",
+                "blacklisted",
+                "locked",
+                "onSale"
+              ]
+            }
+          },
+          {
+            "name": "nextPageToken",
+            "in": "query",
+            "description": "Next page token when there are more than 10,000 content items",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApprovedProductsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/product/sellers/{sellerId}/products/approved/inventory-and-price": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Product Filtering - Approved Products Stock and Price (filterApprovedProductsInventoryAndPrice)",
+        "description": "Returns only the stock and price information of approved products. nextPageToken is used when there are more than 10,000 approved content items. page x size can be at most 10,000. The stockLastModifiedDate field returns a value only if a stock update has been made for the product; otherwise it returns null.\n",
+        "operationId": "filterApprovedProductsInventoryAndPrice",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sellerId"
+          },
+          {
+            "name": "barcode",
+            "in": "query",
+            "description": "Single barcode query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "barcodes",
+            "in": "query",
+            "description": "Multiple barcode query (max 50 barcodes)",
+            "schema": {
+              "type": "array",
+              "maxItems": 50,
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "contentId",
+            "in": "query",
+            "description": "Single content ID query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "stockCode",
+            "in": "query",
+            "description": "Stock code",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productMainId",
+            "in": "query",
+            "description": "Main product code",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Product status filter",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "archived",
+                "blacklisted",
+                "locked",
+                "onSale",
+                "notOnSale"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Items per page (max 100)",
+            "schema": {
+              "type": "integer",
+              "maximum": 100
+            }
+          },
+          {
+            "name": "orderByDirection",
+            "in": "query",
+            "description": "Sort direction based on the sellerCreatedDate field. asc sorts from oldest to newest, desc sorts from newest to oldest.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "nextPageToken",
+            "in": "query",
+            "description": "Next page token when there are more than 10,000 content items",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryAndPriceResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/product/sellers/{sellerId}/products": {
+      "delete": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Product Deletion (deleteProducts)",
+        "description": "Removes products from the Trendyol system. Supports single and bulk product deletion. Products pending approval and approved products that have been archived for more than one day and have not been suspended by Trendyol can be deleted.\n",
+        "operationId": "deleteProducts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sellerId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteProductsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request has been queued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchRequestResponse"
+                },
+                "example": {
+                  "batchRequestId": "c0bd29e1-003d-455a-9d74-3a00d868ce9d-1678194595"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/product/sellers/{sellerId}/products/archive-state": {
+      "put": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Product Archiving (archiveProducts)",
+        "description": "Archives or unarchives products in the Trendyol system. Supports single and bulk product archiving operations. The maximum number of items per request is 1,000.\n",
+        "operationId": "archiveProducts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sellerId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ArchiveProductsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request has been queued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchRequestResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/product/sellers/{sellerId}/products/buybox-information": {
+      "post": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Product Buybox Check Service (getBuyboxInformation)",
+        "description": "Returns the buybox information of products: buybox rank, buybox price, and whether there are multiple sellers. A maximum of 10 barcodes can be sent. Service rate limit is 1000 req/min.\n",
+        "operationId": "getBuyboxInformation",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sellerId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuyboxRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuyboxResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/product/sellers/{sellerId}/products/unlock": {
+      "put": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Product Unlock Service (unlockProducts)",
+        "description": "Unlocks locked products. Products that have been suspended from sale due to low/high pricing, critical price errors, or inability to supply can be unlocked using this service.\n",
+        "operationId": "unlockProducts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sellerId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnlockProductsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request has been queued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchRequestResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/product/sellers/{sellerId}/products/unapproved-bulk-update": {
+      "post": {
+        "tags": [
+          "Updates"
+        ],
+        "summary": "Product Update - Unapproved Products (updateUnapprovedProducts)",
+        "description": "Updates unapproved products in your Trendyol store. The maximum number of items per request is 1,000.\n",
+        "operationId": "updateUnapprovedProducts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sellerId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUnapprovedRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request has been queued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchRequestResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/product/sellers/{sellerId}/products/content-bulk-update": {
+      "post": {
+        "tags": [
+          "Updates"
+        ],
+        "summary": "Product Update - Approved Content (updateContentBulk)",
+        "description": "Updates the content information of approved products. Partial update is supported except for attribute values. If any attribute is to be updated, all attributes and their values must be sent. Maximum 1,000 items per request.\n",
+        "operationId": "updateContentBulk",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sellerId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContentBulkUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request has been queued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchRequestResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/product/sellers/{sellerId}/products/variant-bulk-update": {
+      "post": {
+        "tags": [
+          "Updates"
+        ],
+        "summary": "Product Update - Approved Variant (updateVariantBulk)",
+        "description": "Updates the variant information of approved products. All fields except the barcode field can be updated. Partial update is not supported. Maximum 1,000 items.\n",
+        "operationId": "updateVariantBulk",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sellerId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VariantBulkUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request has been queued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchRequestResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/product/sellers/{sellerId}/products/delivery-info-bulk-update": {
+      "post": {
+        "tags": [
+          "Updates"
+        ],
+        "summary": "Product Update - Delivery Information (updateDeliveryInfoBulk)",
+        "description": "Updates the delivery information of approved products. All fields except the barcode field can be updated. Maximum 1,000 items.\n",
+        "operationId": "updateDeliveryInfoBulk",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sellerId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryInfoBulkUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request has been queued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchRequestResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/product/sellers/{sellerId}/products/{contentId}/update-audits": {
+      "get": {
+        "tags": [
+          "Updates"
+        ],
+        "summary": "Product Information Update Result Check Service (getUpdateAudits)",
+        "description": "Returns the product review step result for successful requests previously sent to the product information update services. If an update was rejected, the reasons are provided in the rejectReasons field. The content of the updates field varies depending on the update type (type).\n",
+        "operationId": "getUpdateAudits",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sellerId"
+          },
+          {
+            "name": "contentId",
+            "in": "path",
+            "required": true,
+            "description": "Product content ID",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Items per page",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Update status filter (SUCCESS, FAIL, RUNNING)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/storefrontcode"
+          },
+          {
+            "$ref": "#/components/parameters/acceptLanguage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateAuditsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/inventory/sellers/{sellerId}/products/price-and-inventory": {
+      "post": {
+        "tags": [
+          "Inventory"
+        ],
+        "summary": "Stock and Price Update (updatePriceAndInventory)",
+        "description": "Updates the price and stock information of products that have been transferred to and approved by Trendyol. You cannot send the same request repeatedly for 15 minutes. Maximum 1,000 items, maximum 20,000 stock per product.\n",
+        "operationId": "updatePriceAndInventory",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sellerId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PriceAndInventoryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request has been queued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchRequestResponse"
+                },
+                "example": {
+                  "batchRequestId": "fa75dfd5-6ce6-4730-a09e-97563500000-1529854840"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/product/sellers/{sellerId}/products/batch-requests/{batchRequestId}": {
+      "get": {
+        "tags": [
+          "BatchRequests"
+        ],
+        "summary": "Batch Request Status Check (getBatchRequestResult)",
+        "description": "Checks the result of operations obtained via batchRequestId. The status field is checked to determine whether the batch operation has been completed. Batch request results can be viewed up to 4 hours after completion.\n",
+        "operationId": "getBatchRequestResult",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sellerId"
+          },
+          {
+            "name": "batchRequestId",
+            "in": "path",
+            "required": true,
+            "description": "Batch request ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchRequestResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/product/lookup/cargo-providers": {
+      "get": {
+        "tags": [
+          "Lookup"
+        ],
+        "summary": "Cargo Provider Filtering Service (getCargoProviders)",
+        "description": "Lists the available cargo providers. The returned code values can be sent in the cargoProviders field of product creation and update requests. The list varies by storefront; if the storefrontcode header is not sent, TR is used by default.\n",
+        "operationId": "getCargoProviders",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/storefrontcode"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CargoProvider"
+                  }
+                },
+                "example": [
+                  {
+                    "code": "KOLAYGELSINMP",
+                    "name": "Kolay Gelsin"
+                  },
+                  {
+                    "code": "YKMP",
+                    "name": "Yurtiçi Kargo"
+                  },
+                  {
+                    "code": "SURATMP",
+                    "name": "Sürat Kargo"
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Basic Authentication - Enter your API Key as the Username and API Secret Key as the Password. These credentials can be obtained from Trendyol Seller Panel > My Account > Integration Information. A User-Agent header is required for all requests (format: \"SellerId - IntegratorCompanyName\" or \"SellerId - SelfIntegration\")."
+      }
+    },
+    "parameters": {
+      "sellerId": {
+        "name": "sellerId",
+        "in": "path",
+        "required": true,
+        "description": "Seller ID",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "storefrontcode": {
+        "name": "storefrontcode",
+        "in": "header",
+        "required": false,
+        "description": "Country code. If not sent, or if TR is sent, the Türkiye storefront is used.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "acceptLanguage": {
+        "name": "Accept-Language",
+        "in": "header",
+        "required": false,
+        "description": "Language of the service response. On the TR storefront the response is always returned in Turkish. On other storefronts the values tr, en, ro, ar, and el are supported; en is used when the header is omitted or an unsupported value is sent.",
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Missing or invalid parameter in the URL.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "One of supplierID, API Key, or API Secret Key is missing or incorrect."
+      },
+      "NotFound": {
+        "description": "The request URL is invalid."
+      },
+      "InternalServerError": {
+        "description": "A temporary error may have occurred. Please wait a few minutes."
+      }
+    },
+    "schemas": {
+      "Brand": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "BrandsResponse": {
+        "type": "object",
+        "properties": {
+          "brands": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Brand"
+            }
+          }
+        }
+      },
+      "Category": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parentId": {
+            "type": "integer"
+          },
+          "subCategories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Category"
+            }
+          }
+        }
+      },
+      "CategoryAttribute": {
+        "type": "object",
+        "properties": {
+          "allowCustom": {
+            "type": "boolean"
+          },
+          "attribute": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "categoryId": {
+            "type": "integer"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "varianter": {
+            "type": "boolean"
+          },
+          "slicer": {
+            "type": "boolean"
+          },
+          "allowMultipleAttributeValues": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CategoryAttributesResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "categoryAttributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryAttribute"
+            }
+          }
+        }
+      },
+      "AttributeValueItem": {
+        "type": "object",
+        "properties": {
+          "attributeValueId": {
+            "type": "integer"
+          },
+          "attributeValueName": {
+            "type": "string"
+          }
+        }
+      },
+      "AttributeValuesPageResponse": {
+        "type": "object",
+        "properties": {
+          "totalElements": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AttributeValueItem"
+            }
+          }
+        }
+      },
+      "ProductImage": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductAttribute": {
+        "type": "object",
+        "required": [
+          "attributeId"
+        ],
+        "properties": {
+          "attributeId": {
+            "type": "integer"
+          },
+          "attributeValueIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "attributeValue": {
+            "type": "string"
+          }
+        }
+      },
+      "DeliveryOption": {
+        "type": "object",
+        "properties": {
+          "deliveryDuration": {
+            "type": "integer"
+          },
+          "fastDeliveryType": {
+            "type": "string",
+            "enum": [
+              "SAME_DAY_SHIPPING",
+              "FAST_DELIVERY"
+            ]
+          }
+        }
+      },
+      "CreateProductItem": {
+        "type": "object",
+        "required": [
+          "barcode",
+          "title",
+          "productMainId",
+          "brandId",
+          "categoryId",
+          "quantity",
+          "stockCode",
+          "dimensionalWeight",
+          "description",
+          "listPrice",
+          "salePrice",
+          "images",
+          "vatRate",
+          "attributes"
+        ],
+        "properties": {
+          "barcode": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "productMainId": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "brandId": {
+            "type": "integer"
+          },
+          "categoryId": {
+            "type": "integer"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "stockCode": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "dimensionalWeight": {
+            "type": "number"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 30000
+          },
+          "listPrice": {
+            "type": "number"
+          },
+          "salePrice": {
+            "type": "number"
+          },
+          "deliveryOption": {
+            "$ref": "#/components/schemas/DeliveryOption"
+          },
+          "images": {
+            "type": "array",
+            "maxItems": 8,
+            "items": {
+              "$ref": "#/components/schemas/ProductImage"
+            }
+          },
+          "vatRate": {
+            "type": "integer"
+          },
+          "lotNumber": {
+            "type": "string",
+            "maxLength": 100,
+            "nullable": true
+          },
+          "shipmentAddressId": {
+            "type": "integer"
+          },
+          "returningAddressId": {
+            "type": "integer"
+          },
+          "attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductAttribute"
+            }
+          }
+        }
+      },
+      "CreateProductsRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 1000,
+            "items": {
+              "$ref": "#/components/schemas/CreateProductItem"
+            }
+          }
+        }
+      },
+      "DeleteProductItem": {
+        "type": "object",
+        "required": [
+          "barcode"
+        ],
+        "properties": {
+          "barcode": {
+            "type": "string"
+          }
+        }
+      },
+      "DeleteProductsRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DeleteProductItem"
+            }
+          }
+        }
+      },
+      "ArchiveProductItem": {
+        "type": "object",
+        "required": [
+          "barcode",
+          "archived"
+        ],
+        "properties": {
+          "barcode": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "archived": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ArchiveProductsRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 1000,
+            "items": {
+              "$ref": "#/components/schemas/ArchiveProductItem"
+            }
+          }
+        }
+      },
+      "UnlockProductItem": {
+        "type": "object",
+        "required": [
+          "barcode"
+        ],
+        "properties": {
+          "barcode": {
+            "type": "string"
+          }
+        }
+      },
+      "UnlockProductsRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnlockProductItem"
+            }
+          }
+        }
+      },
+      "BuyboxRequest": {
+        "type": "object",
+        "required": [
+          "barcodes"
+        ],
+        "properties": {
+          "barcodes": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "BuyboxInfo": {
+        "type": "object",
+        "properties": {
+          "barcode": {
+            "type": "string"
+          },
+          "buyboxOrder": {
+            "type": "integer"
+          },
+          "buyboxPrice": {
+            "type": "number"
+          },
+          "hasMultipleSeller": {
+            "type": "boolean"
+          }
+        }
+      },
+      "BuyboxResponse": {
+        "type": "object",
+        "properties": {
+          "buyboxInfo": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BuyboxInfo"
+            }
+          }
+        }
+      },
+      "PriceAndInventoryItem": {
+        "type": "object",
+        "required": [
+          "barcode"
+        ],
+        "properties": {
+          "barcode": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "salePrice": {
+            "type": "number"
+          },
+          "listPrice": {
+            "type": "number"
+          }
+        }
+      },
+      "PriceAndInventoryRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 1000,
+            "items": {
+              "$ref": "#/components/schemas/PriceAndInventoryItem"
+            }
+          }
+        }
+      },
+      "ProductBaseResponse": {
+        "type": "object",
+        "properties": {
+          "barcode": {
+            "type": "string"
+          },
+          "approved": {
+            "type": "boolean"
+          },
+          "approvedDate": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "listingId": {
+            "type": "string"
+          },
+          "contentId": {
+            "type": "integer"
+          }
+        }
+      },
+      "BrandInfo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "CategoryInfo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "RejectReasonDetail": {
+        "type": "object",
+        "properties": {
+          "rejectReason": {
+            "type": "string"
+          },
+          "rejectReasonDetail": {
+            "type": "string"
+          }
+        }
+      },
+      "UnapprovedProduct": {
+        "type": "object",
+        "properties": {
+          "supplierId": {
+            "type": "integer"
+          },
+          "productMainId": {
+            "type": "string"
+          },
+          "createDateTime": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "lastUpdateDate": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "lastPriceChangeDate": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "lastStockChangeDate": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "brand": {
+            "$ref": "#/components/schemas/BrandInfo"
+          },
+          "category": {
+            "$ref": "#/components/schemas/CategoryInfo"
+          },
+          "barcode": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "listPrice": {
+            "type": "number"
+          },
+          "salePrice": {
+            "type": "number"
+          },
+          "vatRate": {
+            "type": "integer"
+          },
+          "dimensionalWeight": {
+            "type": "number",
+            "nullable": true
+          },
+          "stockCode": {
+            "type": "string"
+          },
+          "media": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductImage"
+            }
+          },
+          "attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductAttribute"
+            }
+          },
+          "rejectReasonDetails": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RejectReasonDetail"
+            }
+          },
+          "locationBasedDelivery": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "ENABLED",
+              "DISABLED"
+            ]
+          },
+          "lotNumber": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "UnapprovedProductsResponse": {
+        "type": "object",
+        "properties": {
+          "totalElements": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "nextPageToken": {
+            "type": "string"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnapprovedProduct"
+            }
+          }
+        }
+      },
+      "ApprovedAttributeValue": {
+        "type": "object",
+        "properties": {
+          "attributeValueId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "attributeValue": {
+            "type": "string"
+          }
+        }
+      },
+      "ApprovedAttribute": {
+        "type": "object",
+        "properties": {
+          "attributeId": {
+            "type": "integer"
+          },
+          "attributeName": {
+            "type": "string"
+          },
+          "attributeValues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApprovedAttributeValue"
+            }
+          }
+        }
+      },
+      "VariantAttribute": {
+        "type": "object",
+        "properties": {
+          "attributeId": {
+            "type": "integer"
+          },
+          "attributeName": {
+            "type": "string"
+          },
+          "attributeValueId": {
+            "type": "integer"
+          },
+          "attributeValue": {
+            "type": "string"
+          }
+        }
+      },
+      "FastDeliveryOption": {
+        "type": "object",
+        "properties": {
+          "deliveryOptionType": {
+            "type": "string",
+            "enum": [
+              "SAME_DAY_SHIPPING",
+              "FAST_DELIVERY"
+            ]
+          },
+          "deliveryDailyCutOffHour": {
+            "type": "string"
+          }
+        }
+      },
+      "VariantDeliveryOptions": {
+        "type": "object",
+        "properties": {
+          "deliveryDuration": {
+            "type": "integer"
+          },
+          "isRushDelivery": {
+            "type": "boolean"
+          },
+          "fastDeliveryOptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FastDeliveryOption"
+            }
+          }
+        }
+      },
+      "VariantPrice": {
+        "type": "object",
+        "properties": {
+          "salePrice": {
+            "type": "number"
+          },
+          "listPrice": {
+            "type": "number"
+          }
+        }
+      },
+      "VariantStock": {
+        "type": "object",
+        "properties": {
+          "lastModifiedDate": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          }
+        }
+      },
+      "ApprovedVariant": {
+        "type": "object",
+        "properties": {
+          "variantId": {
+            "type": "integer"
+          },
+          "supplierId": {
+            "type": "integer"
+          },
+          "barcode": {
+            "type": "string"
+          },
+          "attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VariantAttribute"
+            }
+          },
+          "productUrl": {
+            "type": "string"
+          },
+          "onSale": {
+            "type": "boolean"
+          },
+          "deliveryOptions": {
+            "$ref": "#/components/schemas/VariantDeliveryOptions"
+          },
+          "stock": {
+            "$ref": "#/components/schemas/VariantStock"
+          },
+          "price": {
+            "$ref": "#/components/schemas/VariantPrice"
+          },
+          "stockCode": {
+            "type": "string"
+          },
+          "vatRate": {
+            "type": "integer"
+          },
+          "sellerCreatedDate": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sellerModifiedDate": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "locked": {
+            "type": "boolean"
+          },
+          "lockReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "lockDate": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "archivedDate": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "docNeeded": {
+            "type": "boolean"
+          },
+          "hasViolation": {
+            "type": "boolean"
+          },
+          "blacklisted": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ApprovedContent": {
+        "type": "object",
+        "properties": {
+          "contentId": {
+            "type": "integer"
+          },
+          "productMainId": {
+            "type": "string"
+          },
+          "brand": {
+            "$ref": "#/components/schemas/BrandInfo"
+          },
+          "category": {
+            "$ref": "#/components/schemas/CategoryInfo"
+          },
+          "creationDate": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "lastModifiedDate": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "lastModifiedBy": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductImage"
+            }
+          },
+          "attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApprovedAttribute"
+            }
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApprovedVariant"
+            }
+          }
+        }
+      },
+      "ApprovedProductsResponse": {
+        "type": "object",
+        "properties": {
+          "totalElements": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "nextPageToken": {
+            "type": "string"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApprovedContent"
+            }
+          }
+        }
+      },
+      "UpdateUnapprovedItem": {
+        "type": "object",
+        "required": [
+          "barcode"
+        ],
+        "properties": {
+          "barcode": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "productMainId": {
+            "type": "string"
+          },
+          "brandId": {
+            "type": "integer"
+          },
+          "categoryId": {
+            "type": "integer"
+          },
+          "stockCode": {
+            "type": "string"
+          },
+          "dimensionalWeight": {
+            "type": "number"
+          },
+          "vatRate": {
+            "type": "integer"
+          },
+          "deliveryOption": {
+            "$ref": "#/components/schemas/DeliveryOption"
+          },
+          "locationBasedDelivery": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "ENABLED",
+              "DISABLED"
+            ]
+          },
+          "lotNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "shipmentAddressId": {
+            "type": "integer"
+          },
+          "returningAddressId": {
+            "type": "integer"
+          },
+          "images": {
+            "type": "array",
+            "maxItems": 8,
+            "items": {
+              "$ref": "#/components/schemas/ProductImage"
+            }
+          },
+          "attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductAttribute"
+            }
+          }
+        }
+      },
+      "UpdateUnapprovedRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 1000,
+            "items": {
+              "$ref": "#/components/schemas/UpdateUnapprovedItem"
+            }
+          }
+        }
+      },
+      "ContentUpdateItem": {
+        "type": "object",
+        "required": [
+          "contentId"
+        ],
+        "properties": {
+          "contentId": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "images": {
+            "type": "array",
+            "maxItems": 8,
+            "items": {
+              "$ref": "#/components/schemas/ProductImage"
+            }
+          },
+          "attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductAttribute"
+            }
+          }
+        }
+      },
+      "ContentBulkUpdateRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 1000,
+            "items": {
+              "$ref": "#/components/schemas/ContentUpdateItem"
+            }
+          }
+        }
+      },
+      "VariantUpdateItem": {
+        "type": "object",
+        "required": [
+          "barcode"
+        ],
+        "properties": {
+          "barcode": {
+            "type": "string"
+          },
+          "stockCode": {
+            "type": "string"
+          },
+          "vatRate": {
+            "type": "integer"
+          },
+          "shipmentAddressId": {
+            "type": "integer"
+          },
+          "returningAddressId": {
+            "type": "integer"
+          },
+          "dimensionalWeight": {
+            "type": "number"
+          },
+          "lotNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "locationBasedDelivery": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "ENABLED",
+              "DISABLED"
+            ]
+          }
+        }
+      },
+      "VariantBulkUpdateRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 1000,
+            "items": {
+              "$ref": "#/components/schemas/VariantUpdateItem"
+            }
+          }
+        }
+      },
+      "DeliveryInfoUpdateItem": {
+        "type": "object",
+        "required": [
+          "barcode"
+        ],
+        "properties": {
+          "barcode": {
+            "type": "string"
+          },
+          "deliveryOptions": {
+            "type": "object",
+            "properties": {
+              "deliveryDuration": {
+                "type": "integer"
+              },
+              "fastDeliveryType": {
+                "type": "string",
+                "enum": [
+                  "SAME_DAY_SHIPPING",
+                  "FAST_DELIVERY"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "DeliveryInfoBulkUpdateRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 1000,
+            "items": {
+              "$ref": "#/components/schemas/DeliveryInfoUpdateItem"
+            }
+          }
+        }
+      },
+      "BatchRequestResponse": {
+        "type": "object",
+        "properties": {
+          "batchRequestId": {
+            "type": "string"
+          }
+        }
+      },
+      "BatchRequestResult": {
+        "type": "object",
+        "properties": {
+          "batchRequestId": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "requestItem": {
+                  "type": "object"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "SUCCESS",
+                    "FAILED"
+                  ]
+                },
+                "failureReasons": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "COMPLETED",
+              "IN_PROGRESS"
+            ]
+          },
+          "creationDate": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "lastModification": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sourceType": {
+            "type": "string",
+            "enum": [
+              "API",
+              "WEB"
+            ]
+          },
+          "itemCount": {
+            "type": "integer"
+          },
+          "failedItemCount": {
+            "type": "integer"
+          },
+          "batchRequestType": {
+            "type": "string",
+            "enum": [
+              "ProductV2OnBoarding",
+              "ProductV2Update",
+              "ProductInventoryUpdate",
+              "ProductArchiveUpdate",
+              "ProductDeletion"
+            ]
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "errorCode": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateBrandRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "images"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the brand to be created"
+          },
+          "images": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "description": "Images belonging to the brand",
+            "items": {
+              "type": "string",
+              "format": "binary"
+            }
+          }
+        }
+      },
+      "CreateBrandResponse": {
+        "type": "object",
+        "properties": {
+          "brandId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "InventoryAndPriceVariant": {
+        "type": "object",
+        "properties": {
+          "variantId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "barcode": {
+            "type": "string"
+          },
+          "salePrice": {
+            "type": "number"
+          },
+          "listPrice": {
+            "type": "number"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "stockCode": {
+            "type": "string"
+          },
+          "stockLastModifiedDate": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true,
+            "description": "Returns null if no stock update has been made for the product"
+          }
+        }
+      },
+      "InventoryAndPriceContent": {
+        "type": "object",
+        "properties": {
+          "contentId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "productMainId": {
+            "type": "string"
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InventoryAndPriceVariant"
+            }
+          }
+        }
+      },
+      "InventoryAndPriceResponse": {
+        "type": "object",
+        "properties": {
+          "totalElements": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "nextPageToken": {
+            "type": "string"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InventoryAndPriceContent"
+            }
+          }
+        }
+      },
+      "UpdateAuditRejectReason": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Reject reason type"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Reject reason summary"
+          },
+          "detail": {
+            "type": "string",
+            "description": "Reject reason detail"
+          },
+          "parameters": {
+            "type": "object",
+            "description": "Additional reject reason parameters"
+          }
+        }
+      },
+      "UpdateAuditImage": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "order": {
+            "type": "integer"
+          }
+        }
+      },
+      "UpdateAuditAttribute": {
+        "type": "object",
+        "properties": {
+          "attributeId": {
+            "type": "integer"
+          },
+          "attributeValueId": {
+            "type": "integer"
+          },
+          "customAttributeValue": {
+            "type": "string"
+          },
+          "attributeValue": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateAuditDetail": {
+        "type": "object",
+        "description": "Update detail. The populated fields vary depending on the value of the type field: changedTitle/existingTitle for TITLE, changedDescription/existingDescription for DESCRIPTION, changedMedias/existingMedias for MEDIA, and changedAttributes/existingAttributes for ATTRIBUTE.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "TITLE",
+              "DESCRIPTION",
+              "MEDIA",
+              "ATTRIBUTE"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "SUCCESS",
+              "FAIL",
+              "RUNNING"
+            ]
+          },
+          "completedDate": {
+            "type": "string"
+          },
+          "rejectReasons": {
+            "type": "array",
+            "description": "Returned when status is FAIL",
+            "items": {
+              "$ref": "#/components/schemas/UpdateAuditRejectReason"
+            }
+          },
+          "changedTitle": {
+            "type": "string"
+          },
+          "existingTitle": {
+            "type": "string"
+          },
+          "changedDescription": {
+            "type": "string"
+          },
+          "existingDescription": {
+            "type": "string"
+          },
+          "changedMedias": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UpdateAuditImage"
+            }
+          },
+          "existingMedias": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UpdateAuditImage"
+            }
+          },
+          "changedAttributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UpdateAuditAttribute"
+            }
+          },
+          "existingAttributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UpdateAuditAttribute"
+            }
+          }
+        }
+      },
+      "UpdateAuditItem": {
+        "type": "object",
+        "properties": {
+          "barcode": {
+            "type": "string"
+          },
+          "contentId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "batchRequestId": {
+            "type": "string"
+          },
+          "requestDate": {
+            "type": "string"
+          },
+          "updates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UpdateAuditDetail"
+            }
+          }
+        }
+      },
+      "UpdateAuditsResponse": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "totalPage": {
+            "type": "integer"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UpdateAuditItem"
+            }
+          }
+        }
+      },
+      "CargoProvider": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Cargo provider code. This value is sent in the cargoProviders field."
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name of the cargo provider"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}

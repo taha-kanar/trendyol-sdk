@@ -1,0 +1,15 @@
+{
+  "components": {
+    "schemas": {
+      "Answer": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "x-observed": "2026-08-24"
+          }
+        }
+      }
+    }
+  }
+}

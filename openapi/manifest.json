@@ -1,0 +1,136 @@
+{
+  "note": "Copies of Trendyol's published OpenAPI documents, extracted from the pages listed as `sourcePage`. Refresh with `npm run specs:fetch`, then `npm run generate`.",
+  "specs": [
+    {
+      "file": "marketplace.json",
+      "module": "marketplace",
+      "title": "Trendyol Marketplace Integration",
+      "description": "Orders, claims and address information",
+      "servers": [
+        "https://apigw.trendyol.com/integration",
+        "https://stageapigw.trendyol.com/integration"
+      ],
+      "operations": 34,
+      "sourcePage": "https://developers.trendyol.com/v2.0/reference/getshipmentpackages"
+    },
+    {
+      "file": "product.json",
+      "module": "product",
+      "title": "Trendyol International Marketplace - Product Integration API",
+      "description": "Products, categories, brands, inventory, batch requests",
+      "servers": [
+        "https://apigw.trendyol.com/integration",
+        "https://stageapigw.trendyol.com/integration"
+      ],
+      "operations": 23,
+      "sourcePage": "https://developers.trendyol.com/v2.0/reference/createproducts"
+    },
+    {
+      "file": "cargo-invoice.json",
+      "module": "cargo-invoice",
+      "title": "Trendyol Domestic Cargo Invoice Details Integration",
+      "description": "Cargo invoice details",
+      "servers": [
+        "https://apigw.trendyol.com/integration/finance/che",
+        "https://stageapigw.trendyol.com/integration/finance/che"
+      ],
+      "operations": 1,
+      "sourcePage": "https://developers.trendyol.com/v2.0/reference/getcargoinvoiceitems"
+    },
+    {
+      "file": "express.json",
+      "module": "express",
+      "title": "Trendyol Express Integration",
+      "description": "Trendyol Express compensation tickets",
+      "servers": [
+        "https://apigw.trendyol.com/integration",
+        "https://stageapigw.trendyol.com/integration"
+      ],
+      "operations": 1,
+      "sourcePage": "https://developers.trendyol.com/v2.0/reference/getcompensationtickets"
+    },
+    {
+      "file": "common-label.json",
+      "module": "common-label",
+      "title": "Trendyol Marketplace Integration - Common Label Barcode Integration",
+      "description": "Common label barcode",
+      "servers": [
+        "https://apigw.trendyol.com/integration",
+        "https://stageapigw.trendyol.com/integration"
+      ],
+      "operations": 2,
+      "sourcePage": "https://developers.trendyol.com/v2.0/reference/createcommonlabel"
+    },
+    {
+      "file": "finance.json",
+      "module": "finance",
+      "title": "Trendyol Domestic Current Account Statement Integration",
+      "description": "Settlements and other financials",
+      "servers": [
+        "https://apigw.trendyol.com/integration/finance/che",
+        "https://stageapigw.trendyol.com/integration/finance/che"
+      ],
+      "operations": 2,
+      "sourcePage": "https://developers.trendyol.com/v2.0/reference/getotherfinancials"
+    },
+    {
+      "file": "test-order.json",
+      "module": "test-order",
+      "title": "Trendyol Test Order API",
+      "description": "Test order helpers (stage only)",
+      "servers": [
+        "https://stageapigw.trendyol.com/integration"
+      ],
+      "operations": 3,
+      "sourcePage": "https://developers.trendyol.com/v2.0/reference/createtestorder"
+    },
+    {
+      "file": "supplier-address.json",
+      "module": "supplier-address",
+      "title": "Trendyol Marketplace - Supplier Information Integration",
+      "description": "Supplier addresses",
+      "servers": [
+        "https://apigw.trendyol.com/integration",
+        "https://stageapigw.trendyol.com/integration"
+      ],
+      "operations": 1,
+      "sourcePage": "https://developers.trendyol.com/v2.0/reference/getsuppliersaddresses"
+    },
+    {
+      "file": "question.json",
+      "module": "question",
+      "title": "Trendyol Marketplace - Customer Question Integration",
+      "description": "Customer questions and answers",
+      "servers": [
+        "https://apigw.trendyol.com/integration",
+        "https://stageapigw.trendyol.com/integration"
+      ],
+      "operations": 4,
+      "sourcePage": "https://developers.trendyol.com/v2.0/reference/getquestionfilter"
+    },
+    {
+      "file": "invoice.json",
+      "module": "invoice",
+      "title": "Invoice Integration",
+      "description": "Invoice links and invoice file upload",
+      "servers": [
+        "https://apigw.trendyol.com/integration",
+        "https://stageapigw.trendyol.com/integration"
+      ],
+      "operations": 3,
+      "sourcePage": "https://developers.trendyol.com/v2.0/reference/sendinvoicelink"
+    },
+    {
+      "file": "webhook.json",
+      "module": "webhook",
+      "title": "Trendyol Webhook API",
+      "description": "Webhook management",
+      "servers": [
+        "https://apigw.trendyol.com/integration/webhook",
+        "https://stageapigw.trendyol.com/integration/webhook"
+      ],
+      "operations": 6,
+      "sourcePage": "https://developers.trendyol.com/v2.0/reference/createwebhook"
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "components": {
+    "schemas": {
+      "ApprovedAttribute": {
+        "properties": {
+          "attributeValue": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          },
+          "attributeValueId": {
+            "type": "integer",
+            "format": "int64",
+            "x-observed": "2026-08-24"
+          }
+        }
+      },
+      "ApprovedVariant": {
+        "properties": {
+          "commission": {
+            "type": "integer",
+            "format": "int64",
+            "x-observed": "2026-08-24"
+          },
+          "dimensionalWeight": {
+            "type": "integer",
+            "format": "int64",
+            "x-observed": "2026-08-24"
+          },
+          "locationBasedDelivery": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          },
+          "channels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "x-observed": "2026-08-24"
+          }
+        }
+      },
+      "VariantStock": {
+        "properties": {
+          "quantity": {
+            "type": "integer",
+            "format": "int64",
+            "x-observed": "2026-08-24"
+          }
+        }
+      },
+      "VariantPrice": {
+        "properties": {
+          "priceSeenByCustomer": {
+            "type": "number",
+            "format": "double",
+            "x-observed": "2026-08-24"
+          }
+        }
+      },
+      "UnapprovedProduct": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          },
+          "origin": {
+            "nullable": true,
+            "x-observed": "2026-08-24"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string"
+                }
+              }
+            },
+            "x-observed": "2026-08-24"
+          },
+          "specialConsumptionTax": {
+            "nullable": true,
+            "x-observed": "2026-08-24"
+          },
+          "sgrPrice": {
+            "nullable": true,
+            "x-observed": "2026-08-24"
+          },
+          "cargoProviders": {
+            "type": "array",
+            "items": {},
+            "x-observed": "2026-08-24"
+          }
+        }
+      },
+      "ProductAttribute": {
+        "properties": {
+          "attributeName": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          },
+          "attributeValueId": {
+            "type": "integer",
+            "format": "int64",
+            "x-observed": "2026-08-24"
+          }
+        }
+      },
+      "Brand": {
+        "properties": {
+          "luxe": {
+            "type": "boolean",
+            "x-observed": "2026-08-24"
+          }
+        }
+      },
+      "AttributeValueItem": {
+        "properties": {
+          "attributeValue": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          }
+        }
+      }
+    }
+  }
+}

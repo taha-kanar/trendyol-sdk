@@ -1,0 +1,22 @@
+{
+  "components": {
+    "schemas": {
+      "SupplierAddress": {
+        "properties": {
+          "stateCountyProvince": {
+            "nullable": true,
+            "x-observed": "2026-08-24"
+          },
+          "buildingNumber": {
+            "nullable": true,
+            "x-observed": "2026-08-24"
+          },
+          "shortAddress": {
+            "nullable": true,
+            "x-observed": "2026-08-24"
+          }
+        }
+      }
+    }
+  }
+}

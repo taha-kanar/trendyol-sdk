@@ -1,0 +1,346 @@
+{
+  "openapi": "3.0.3",
+  "x-readme": {
+    "proxy-enabled": false
+  },
+  "info": {
+    "title": "Trendyol Marketplace Integration - Common Label Barcode Integration",
+    "description": "Trendyol Common Label Barcode Integration API",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Trendyol Integration Support",
+      "email": "entegrasyon@trendyol.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://apigw.trendyol.com/integration",
+      "description": "Production Environment (PROD)"
+    },
+    {
+      "url": "https://stageapigw.trendyol.com/integration",
+      "description": "Staging Environment (STAGE)"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Common Label Barcode Integration",
+      "description": "Common label barcode create and get operations"
+    }
+  ],
+  "paths": {
+    "/sellers/{sellerId}/common-label/{cargoTrackingNumber}": {
+      "post": {
+        "tags": [
+          "Common Label Barcode Create Integration"
+        ],
+        "summary": "Create Common Label Barcode - createCommonLabel",
+        "description": "The common barcode process can be used for Trendyol pays shipments with TEX and Aras Cargo.\nWith this service, you can request a barcode for the relevant cargo number for orders in the common label process. After the barcode is created, it will be returned to you in ZPL format from the Get Common Label Barcode Service.\n\n**Important Notes:**\n- It is recommended to make the barcode request after you have fed the order package with PICKING or INVOICED status.\n- Currently, only ZPL format is available.\n",
+        "operationId": "createCommonLabel",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Seller ID"
+          },
+          {
+            "name": "cargoTrackingNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Cargo tracking number (cargoTrackingNumber)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "format"
+                ],
+                "properties": {
+                  "format": {
+                    "type": "string",
+                    "description": "Barcode format type",
+                    "enum": [
+                      "ZPL"
+                    ]
+                  },
+                  "boxQuantity": {
+                    "type": "integer",
+                    "format": "int64",
+                    "description": "Box quantity"
+                  },
+                  "volumetricHeight": {
+                    "type": "number",
+                    "format": "float",
+                    "description": "Volumetric height"
+                  }
+                }
+              },
+              "example": {
+                "format": "ZPL",
+                "boxQuantity": 5,
+                "volumetricHeight": 3.5
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success - No response body"
+          },
+          "400": {
+            "description": "Bad Request - Please check the cargo tracking number you provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "status": 400,
+                    "errors": [
+                      {
+                        "code": 1001,
+                        "type": "BadRequestException",
+                        "title": "Please check the cargo tracking number you provided"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Please check your API credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "status": 401,
+                    "errors": [
+                      {
+                        "code": 1002,
+                        "type": "UnauthorizedException",
+                        "title": "Please check your API credentials"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Shipment not found for the cargo tracking number",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "status": 404,
+                    "errors": [
+                      {
+                        "code": 1001,
+                        "type": "NotFoundException",
+                        "title": "Shipment not found for the cargo tracking number"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Common Label Barcode Get Integration"
+        ],
+        "summary": "Get Common Label Barcode - getCommonLabel",
+        "description": "The common barcode process can be used for Trendyol pays shipments with TEX and Aras Cargo.\nWith this service, you can retrieve the barcode requested from the createCommonLabel service.\n\n**Important Notes:**\n- Multiple labels will be returned for multiple boxes. A single ZPL will be returned for a single box.\n",
+        "operationId": "getCommonLabel",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Seller ID"
+          },
+          {
+            "name": "cargoTrackingNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Cargo tracking number"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success - Barcode labels retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonLabelResponse"
+                },
+                "example": {
+                  "data": [
+                    {
+                      "label": "^XA.......^XZ",
+                      "format": "ZPL"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Please check the cargo tracking number you provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "status": 400,
+                    "errors": [
+                      {
+                        "code": 1001,
+                        "type": "BadRequestException",
+                        "title": "Please check the cargo tracking number you provided"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Please check your API credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "status": 401,
+                    "errors": [
+                      {
+                        "code": 1002,
+                        "type": "UnauthorizedException",
+                        "title": "Please check your API credentials"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Basic Auth with Seller API Key and API Secret"
+      }
+    },
+    "schemas": {
+      "CommonLabelResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "description": "Array of barcode labels",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "description": "Barcode label in ZPL format",
+                  "example": "^XA.......^XZ"
+                },
+                "format": {
+                  "type": "string",
+                  "description": "Barcode format",
+                  "enum": [
+                    "ZPL"
+                  ],
+                  "example": "ZPL"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "integer",
+                "description": "HTTP status code",
+                "example": 404
+              },
+              "errors": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "Error code",
+                      "example": 1001
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "Error type",
+                      "example": "NotFoundException"
+                    },
+                    "title": {
+                      "type": "string",
+                      "description": "Error description",
+                      "example": "Shipment not found for the cargo tracking number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}

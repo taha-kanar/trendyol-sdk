@@ -1,0 +1,26 @@
+{
+  "paths": {
+    "/tex/compensation/sellers/{sellerId}/tickets": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {},
+                      "x-observed": "2026-08-24",
+                      "x-observed-note": "Spec declares object; the API returns array."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

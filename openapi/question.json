@@ -1,0 +1,509 @@
+{
+  "openapi": "3.0.3",
+  "x-readme": {
+    "proxy-enabled": false
+  },
+  "info": {
+    "title": "Trendyol Marketplace - Customer Question Integration",
+    "description": "API service for managing customer questions asked to sellers on Trendyol. \nWith this service, you can filter questions, view details, and answer them.\n",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Trendyol Integration Support",
+      "email": "entegrasyon@trendyol.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://apigw.trendyol.com/integration",
+      "description": "Production Environment (PROD)"
+    },
+    {
+      "url": "https://stageapigw.trendyol.com/integration",
+      "description": "Test Environment (STAGE)"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Customer Question Integration",
+      "description": "Operations for listing, filtering, and answering customer questions."
+    }
+  ],
+  "paths": {
+    "/qna/sellers/{sellerId}/questions/filter": {
+      "get": {
+        "tags": [
+          "Customer Question Integration"
+        ],
+        "summary": "Filter Customer Questions",
+        "description": "Lists questions received by the seller based on various criteria. \nPagination is available.\n",
+        "operationId": "getQuestionFilter",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "ID assigned to the seller by Trendyol."
+          },
+          {
+            "name": "barcode",
+            "in": "query",
+            "description": "Product barcode to retrieve questions belonging to a specific product.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "Start date for filtering. (Ex: 1767214800000 - Epoch in milliseconds)",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "description": "End date for filtering. (Ex: 1767214800000 - Epoch in milliseconds)",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Current status of the question.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "WAITING_FOR_ANSWER",
+                "ANSWERED",
+                "REJECTED",
+                "REPORTED"
+              ]
+            }
+          },
+          {
+            "name": "orderByField",
+            "in": "query",
+            "description": "Field name to sort by.",
+            "schema": {
+              "type": "string",
+              "default": "CreatedDate",
+              "enum": [
+                "CreatedDate",
+                "LastModifiedDate"
+              ]
+            }
+          },
+          {
+            "name": "orderByDirection",
+            "in": "query",
+            "description": "Sorting direction.",
+            "schema": {
+              "type": "string",
+              "default": "DESC",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number to be retrieved (starts from 0).",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Number of questions to list per page.",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10,
+              "maximum": 200
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Questions listed successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Questions"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/qna/sellers/{sellerId}/questions": {
+      "post": {
+        "tags": [
+          "Customer Question Integration"
+        ],
+        "summary": "Create Question",
+        "description": "Creates a new customer question for the specified product. The created question is published after evaluation.",
+        "operationId": "createQuestion",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "ID assigned to the seller by Trendyol."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Question created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateQuestionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/qna/sellers/{sellerId}/questions/{id}": {
+      "get": {
+        "tags": [
+          "Customer Question Integration"
+        ],
+        "summary": "Get Question Detail",
+        "description": "Retrieves all details of a single question given its ID.",
+        "operationId": "getQuestion",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "ID of the question requested for details."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Question details retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Question"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/qna/sellers/{sellerId}/questions/{id}/answers": {
+      "post": {
+        "tags": [
+          "Customer Question Integration"
+        ],
+        "summary": "Answer Question",
+        "description": "An answer is provided for a question from a customer. The answer text is published after evaluation.\n",
+        "operationId": "answerQuestion",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "ID of the question to be answered."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionAnswerRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Answer successfully saved. Sent for evaluation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "example": "Your answer has been successfully saved."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Basic Authentication created using Trendyol API Key and API Secret."
+      }
+    },
+    "schemas": {
+      "Question": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Unique identifier of the question."
+          },
+          "text": {
+            "type": "string",
+            "description": "Question text asked by the customer."
+          },
+          "customerId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "ID of the customer who asked the question."
+          },
+          "userName": {
+            "type": "string",
+            "description": "Masked name and surname of the customer."
+          },
+          "showUserName": {
+            "type": "boolean",
+            "description": "Information on whether the username will be displayed."
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the question.",
+            "enum": [
+              "WAITING_FOR_ANSWER",
+              "ANSWERED",
+              "REJECTED",
+              "REPORTED"
+            ]
+          },
+          "public": {
+            "type": "boolean",
+            "description": "Whether the question is visible to everyone."
+          },
+          "productMainId": {
+            "type": "string",
+            "description": "Main group ID of the product the question was asked for."
+          },
+          "productName": {
+            "type": "string",
+            "description": "Name of the product the question was asked for."
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "Product image URL."
+          },
+          "webUrl": {
+            "type": "string",
+            "description": "Product page link on Trendyol."
+          },
+          "creationDate": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Question creation date (Epoch ms)."
+          },
+          "answeredDateMessage": {
+            "type": "string",
+            "description": "User-friendly text of the answer date. (Ex:\\ \"Your answer was published on 12.02.2026.\")"
+          },
+          "answer": {
+            "$ref": "#/components/schemas/Answer"
+          },
+          "rejectedAnswer": {
+            "$ref": "#/components/schemas/Answer"
+          },
+          "rejectedDate": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Rejection date if the question was rejected."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Reason for rejection or processing."
+          },
+          "reportReason": {
+            "type": "string",
+            "description": "Reason for reporting, if reported."
+          },
+          "reportedDate": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "Answer": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Content of the given answer."
+          },
+          "creationDate": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Answer creation date."
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "QuestionAnswerRequest": {
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 2000,
+            "description": "Answer text to be provided. \n- Minimum: 10 characters\n- Maximum: 2000 characters\n",
+            "example": "Dear customer, our product is 100% cotton."
+          }
+        }
+      },
+      "QuestionCreateRequest": {
+        "type": "object",
+        "required": [
+          "text",
+          "contentId",
+          "userId",
+          "showUserName"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Text of the question to be created."
+          },
+          "contentId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Content ID of the product the question will be asked for."
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "ID of the user asking the question."
+          },
+          "userFullName": {
+            "type": "string",
+            "description": "Full name of the user asking the question."
+          },
+          "showUserName": {
+            "type": "boolean",
+            "description": "Information on whether the username will be displayed."
+          },
+          "channelId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Channel ID.",
+            "example": 1
+          }
+        }
+      },
+      "CreateQuestionResponse": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Unique identifier of the created question."
+          }
+        }
+      },
+      "Questions": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Question"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "description": "Current page number."
+          },
+          "size": {
+            "type": "integer",
+            "description": "Number of records per page."
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Total number of questions."
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}

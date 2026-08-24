@@ -1,0 +1,479 @@
+{
+  "openapi": "3.0.3",
+  "x-readme": {
+    "proxy-enabled": false
+  },
+  "info": {
+    "title": "Trendyol Domestic Current Account Statement Integration",
+    "description": "API for Trendyol Domestic Marketplace Current Account Statement (CHE) Integration.\nYou can get your financial records created in Trendyol system through integration with this service.\n\n- Financial records are created after the order is delivered.\n- TransactionType must be entered. Only 1 type can be entered in 1 request.\n- The paymentOrderId is formed after the order has been paid. Except for exceptions, a payment order is created every Wednesday for orders that are due in the relevant week.\n- With paymentOrderId, you can match your orders and payments.\n- The start and end date are required and the interval between cannot be longer than **15 days**.\n- Store information is used by Market vendors. It will return \"null\" for Marketplace vendors.\n- \"affiliate\" field can return \"TRENDYOLTR\" or \"TRENDYOLAZJV\".\n\n**Services to be used (settlements, otherfinancials) provide separate transaction records.**\n- From \"Settlements\" service: sales, returns, discounts, coupons, and provision transactions.\n- From \"Other Financial\" service: supplier financing, transfers, payments, invoices, supplier invoices, incoming transfers, commission reconciliation invoices.\n",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Trendyol Integration Support",
+      "email": "entegrasyon@trendyol.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://apigw.trendyol.com/integration/finance/che",
+      "description": "Production Environment"
+    },
+    {
+      "url": "https://stageapigw.trendyol.com/integration/finance/che",
+      "description": "Stage Environment"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Settlements",
+      "description": "Sales, returns, discounts, coupons, provisions"
+    },
+    {
+      "name": "Other Financials",
+      "description": "Supplier financing, transfers, payments, invoices, incoming transfers, commission reconciliation invoices"
+    }
+  ],
+  "paths": {
+    "/sellers/{sellerId}/settlements": {
+      "get": {
+        "tags": [
+          "Settlements"
+        ],
+        "summary": "Get Settlements (Sales, Returns, Discounts, Coupons, Provisions)",
+        "description": "Retrieve sales, returns, discounts, coupons, and provision transaction records.\nTransaction Type, SellerRevenuePositive and CommissionNegative should be evaluated together.\nTransaction Type, SellerRevenueNegative and CommissionPositive should be evaluated together.\nTransaction Type, SellerRevenuePositiveCancel and CommissionNegativeCancel should be evaluated together.\nTransaction Type, SellerRevenueNegativeCancel and CommissionPositiveCancel should be evaluated together.\n",
+        "operationId": "getSettlements",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Seller ID"
+          },
+          {
+            "name": "transactionType",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Sale",
+                "Return",
+                "Discount",
+                "DiscountCancel",
+                "Coupon",
+                "CouponCancel",
+                "ProvisionPositive",
+                "ProvisionNegative",
+                "ManuelRefund",
+                "ManualRefundCancel",
+                "TYDiscount",
+                "TYDiscountCancel",
+                "TYCoupon",
+                "TYCouponCancel",
+                "SellerRevenuePositive",
+                "SellerRevenueNegative",
+                "CommissionPositive",
+                "CommissionNegative",
+                "SellerRevenuePositiveCancel",
+                "SellerRevenueNegativeCancel",
+                "CommissionPositiveCancel",
+                "CommissionNegativeCancel"
+              ]
+            },
+            "description": "Type of financial transaction"
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Returns transaction records after a certain date. Timestamp should be sent in milliseconds."
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Returns transaction records before a certain date. Timestamp should be sent in milliseconds."
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "description": "Returns information on the specified page only"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 500,
+              "enum": [
+                500,
+                1000
+              ]
+            },
+            "description": "Specifies the maximum number to be listed on a page."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettlementPageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sellers/{sellerId}/otherfinancials": {
+      "get": {
+        "tags": [
+          "Other Financials"
+        ],
+        "summary": "Get Other Financials (Supplier financing, transfers, payments, invoices, etc.)",
+        "description": "Retrieve supplier financing, transfers, payments (earnings), invoices (from Trendyol to supplier),\nsupplier invoices (from supplier to Trendyol), incoming transfers, and commission reconciliation invoices.\n",
+        "operationId": "getOtherFinancials",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Seller ID"
+          },
+          {
+            "name": "transactionType",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Stoppage",
+                "CashAdvance",
+                "WireTransfer",
+                "IncomingTransfer",
+                "ReturnInvoice",
+                "CommissionAgreementInvoice",
+                "PaymentOrder",
+                "DeductionInvoices",
+                "FinancialItem"
+              ]
+            },
+            "description": "Type of financial transaction"
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Returns transaction records after a certain date. Timestamp should be sent in milliseconds."
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Returns transaction records before a certain date. Timestamp should be sent in milliseconds."
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "description": "Returns information on the specified page only"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 500,
+              "enum": [
+                500,
+                1000
+              ]
+            },
+            "description": "Specifies the maximum number to be listed on a page."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettlementPageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SettlementPageResponse": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "description": "Current page number"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Number of items per page"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages"
+          },
+          "totalElements": {
+            "type": "integer",
+            "description": "Total number of elements"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FinancialTransaction"
+            }
+          }
+        }
+      },
+      "FinancialTransaction": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Transaction ID"
+          },
+          "transactionDate": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Transaction date (Unix timestamp in milliseconds)"
+          },
+          "barcode": {
+            "type": "string",
+            "nullable": true,
+            "description": "Product barcode"
+          },
+          "transactionType": {
+            "type": "string",
+            "description": "Transaction type (e.g., Satış, Ödeme)"
+          },
+          "receiptId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true,
+            "description": "Receipt ID"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Transaction description"
+          },
+          "debt": {
+            "type": "number",
+            "format": "double",
+            "description": "Debt amount"
+          },
+          "credit": {
+            "type": "number",
+            "format": "double",
+            "description": "Credit amount"
+          },
+          "paymentPeriod": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Payment period in days"
+          },
+          "commissionRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true,
+            "description": "Commission rate"
+          },
+          "commissionAmount": {
+            "type": "number",
+            "format": "double",
+            "nullable": true,
+            "description": "Commission amount"
+          },
+          "commissionInvoiceSerialNumber": {
+            "type": "string",
+            "nullable": true,
+            "description": "Commission invoice serial number"
+          },
+          "sellerRevenue": {
+            "type": "number",
+            "format": "double",
+            "nullable": true,
+            "description": "Seller revenue amount"
+          },
+          "orderNumber": {
+            "type": "string",
+            "nullable": true,
+            "description": "Order number"
+          },
+          "paymentOrderId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true,
+            "description": "Payment order ID"
+          },
+          "paymentDate": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true,
+            "description": "Payment date (Unix timestamp in milliseconds)"
+          },
+          "sellerId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Seller ID"
+          },
+          "storeId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true,
+            "description": "Store ID"
+          },
+          "storeName": {
+            "type": "string",
+            "nullable": true,
+            "description": "Store name"
+          },
+          "storeAddress": {
+            "type": "string",
+            "nullable": true,
+            "description": "Store address"
+          },
+          "country": {
+            "type": "string",
+            "description": "Country"
+          },
+          "orderDate": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true,
+            "description": "Order date (Unix timestamp in milliseconds)"
+          },
+          "affiliate": {
+            "type": "string",
+            "description": "Affiliate code (TRENDYOLTR or TRENDYOLAZJV)"
+          },
+          "shipmentPackageId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true,
+            "description": "Shipment package ID"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Seller API Key and API Secret with Basic Auth"
+      },
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Bearer token authentication"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    },
+    {
+      "apiKeyAuth": []
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "components": {
+    "schemas": {
+      "FinancialTransaction": {
+        "properties": {
+          "currency": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          }
+        }
+      }
+    }
+  }
+}

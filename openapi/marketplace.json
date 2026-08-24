@@ -1,0 +1,3543 @@
+{
+  "openapi": "3.0.3",
+  "x-readme": {
+    "proxy-enabled": false
+  },
+  "info": {
+    "title": "Trendyol Marketplace Integration",
+    "description": "API for Trendyol Domestic Marketplace Order and Return Integration",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Trendyol Integration Support",
+      "email": "entegrasyon@trendyol.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://apigw.trendyol.com/integration",
+      "description": "Production Environment"
+    },
+    {
+      "url": "https://stageapigw.trendyol.com/integration",
+      "description": "Stage Environment"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Order Integration",
+      "description": "Order package management and delivery operations"
+    },
+    {
+      "name": "Split Order Package",
+      "description": "Package splitting operations"
+    },
+    {
+      "name": "Shipping Alternative Delivery",
+      "description": "Alternative delivery methods and manual delivery/return operations"
+    },
+    {
+      "name": "Address Information",
+      "description": "Country, city, district and neighborhood information"
+    },
+    {
+      "name": "Returned Orders Integration",
+      "description": "Return operations and management"
+    }
+  ],
+  "paths": {
+    "/order/sellers/{sellerId}/orders": {
+      "get": {
+        "tags": [
+          "Order Integration"
+        ],
+        "summary": "Get Order Packages - getShipmentPackages",
+        "description": "You can retrieve shipment packages about every order placed by customers.",
+        "operationId": "getShipmentPackages",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Seller ID"
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Start date (Unix timestamp in milliseconds)"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "End date (Unix timestamp in milliseconds)"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "description": "Page number"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 200,
+              "maximum": 200
+            },
+            "description": "Page size (maximum 200)"
+          },
+          {
+            "name": "orderNumber",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by order number"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Awaiting",
+                "Created",
+                "Picking",
+                "Invoiced",
+                "Shipped",
+                "Cancelled",
+                "Delivered",
+                "UnDelivered",
+                "Returned",
+                "AtCollectionPoint",
+                "UnSupplied"
+              ]
+            },
+            "description": "Filter by package status"
+          },
+          {
+            "name": "orderByField",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PackageLastModifiedDate",
+                "CreatedDate"
+              ]
+            },
+            "description": "Sort field"
+          },
+          {
+            "name": "orderByDirection",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "description": "Sort direction"
+          },
+          {
+            "name": "shipmentPackageIds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int64"
+              }
+            },
+            "description": "Filter by package IDs (maximum 50)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "page": {
+                      "type": "integer"
+                    },
+                    "size": {
+                      "type": "integer"
+                    },
+                    "totalPages": {
+                      "type": "integer"
+                    },
+                    "totalElements": {
+                      "type": "integer"
+                    },
+                    "content": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ShipmentPackage"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/order/sellers/{sellerId}/orders/stream": {
+      "get": {
+        "tags": [
+          "Order Integration"
+        ],
+        "summary": "Get Shipment Packages via Stream - getShipmentPackagesStream",
+        "description": "You can retrieve shipment packages for orders placed by customers using cursor-based pagination.\nThis method provides a more efficient and reliable way to fetch order packages compared to traditional page-number-based pagination.\nData is returned in a fixed sort order: lastModifiedDate newest to oldest (DESC).\n",
+        "operationId": "getShipmentPackagesStream",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Seller ID"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "maximum": 200
+            },
+            "description": "Maximum number of packages to return per request (default 50, maximum 200)"
+          },
+          {
+            "name": "nextCursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Opaque token used to fetch the next page. Must not be sent in the first request. Use the nextCursor value from the response as-is."
+          },
+          {
+            "name": "packageItemStatuses",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by package item statuses. Multiple statuses can be sent separated by commas.\nValid values: Created, Picking, Invoiced, Shipped, Cancelled, Delivered, UnDelivered, Returned, UnSupplied, AtCollectionPoint, UnPacked, Awaiting\n"
+          },
+          {
+            "name": "lastModifiedStartDate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Fetch packages modified after this date (Unix timestamp in milliseconds)"
+          },
+          {
+            "name": "lastModifiedEndDate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Fetch packages modified before this date (Unix timestamp in milliseconds)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "content": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ShipmentPackage"
+                      }
+                    },
+                    "size": {
+                      "type": "integer",
+                      "description": "Number of packages in the current response"
+                    },
+                    "hasMore": {
+                      "type": "boolean",
+                      "description": "Indicates whether more data is available. If true, the next page exists."
+                    },
+                    "nextCursor": {
+                      "type": "string",
+                      "description": "Cursor value to use for fetching the next page. Empty when hasMore is false."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid nextCursor value, invalid sellerId, cursor-filter mismatch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/order/sellers/{sellerId}/shipment-packages/{packageId}": {
+      "put": {
+        "tags": [
+          "Order Integration"
+        ],
+        "summary": "Notify Packages - updatePackage",
+        "description": "You can update the package of the order with \"Picking\" or \"Invoiced\" status.",
+        "operationId": "updatePackageStatus",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "packageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "status"
+                ],
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "Picking",
+                      "Invoiced"
+                    ],
+                    "description": "New package status"
+                  },
+                  "lines": {
+                    "type": "array",
+                    "description": "Order line pairs for package updates",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "lineId": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "quantity": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  },
+                  "params": {
+                    "type": "object",
+                    "description": "Additional parameters as key-value pairs. Can include invoiceNumber but should be given only for Invoiced status.",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/order/sellers/{sellerId}/shipment-packages/{packageId}/items/unsupplied": {
+      "put": {
+        "tags": [
+          "Order Integration"
+        ],
+        "summary": "Cancel Order Package Item - updatePackage",
+        "description": "You can use this method to cancel one or more item in Order Package.",
+        "operationId": "cancelOrderPackageItem",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "packageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "lines",
+                  "reasonId"
+                ],
+                "properties": {
+                  "lines": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "lineId",
+                        "quantity"
+                      ],
+                      "properties": {
+                        "lineId": {
+                          "type": "integer",
+                          "format": "int64",
+                          "description": "Order line ID to cancel"
+                        },
+                        "quantity": {
+                          "type": "integer",
+                          "description": "Quantity to cancel"
+                        }
+                      }
+                    }
+                  },
+                  "reasonId": {
+                    "type": "integer",
+                    "description": "Cancellation reason ID",
+                    "enum": [
+                      500,
+                      501,
+                      502,
+                      504,
+                      505,
+                      506
+                    ]
+                  }
+                }
+              },
+              "example": {
+                "lines": [
+                  {
+                    "lineId": 123456,
+                    "quantity": 1
+                  }
+                ],
+                "reasonId": 500
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/order/sellers/{sellerId}/shipment-packages/{packageId}/split-packages": {
+      "post": {
+        "tags": [
+          "Split Order Package"
+        ],
+        "summary": "Split Order Packages with Multiple Barcodes - splitMultiPackageByQuantity",
+        "description": "With this method, you can split the products included in an order package with the quantity and orderLineId value of the relevant barcode in the package.",
+        "operationId": "splitMultiPackagesByQuantity",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "packageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "splitPackages"
+                ],
+                "properties": {
+                  "splitPackages": {
+                    "type": "array",
+                    "description": "Array of package groups to create",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "packageDetails"
+                      ],
+                      "properties": {
+                        "packageDetails": {
+                          "type": "array",
+                          "description": "Order lines with quantities to include in this package",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "orderLineId",
+                              "quantities"
+                            ],
+                            "properties": {
+                              "orderLineId": {
+                                "type": "integer",
+                                "format": "int64",
+                                "description": "Order line ID"
+                              },
+                              "quantities": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "description": "Quantity for this order line"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "splitPackages": [
+                  {
+                    "packageDetails": [
+                      {
+                        "orderLineId": 12345,
+                        "quantities": 2
+                      },
+                      {
+                        "orderLineId": 123456,
+                        "quantities": 1
+                      }
+                    ]
+                  },
+                  {
+                    "packageDetails": [
+                      {
+                        "orderLineId": 123,
+                        "quantities": 1
+                      },
+                      {
+                        "orderLineId": 1234,
+                        "quantities": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success - New packages will be created asynchronously"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/order/sellers/{sellerId}/shipment-packages/{packageId}/split": {
+      "post": {
+        "tags": [
+          "Split Order Package"
+        ],
+        "summary": "Split Shipment Package - splitShipmentPackage",
+        "description": "After using this service, new packages depending on the order number will be generated asynchronously.",
+        "operationId": "splitShipmentPackage",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "packageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "orderLineIds"
+                ],
+                "properties": {
+                  "orderLineIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "format": "int64"
+                    },
+                    "description": "Order line IDs to split into new package"
+                  }
+                }
+              },
+              "example": {
+                "orderLineIds": [
+                  123456789
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "newPackageId": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "Newly created package ID"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/order/sellers/{sellerId}/shipment-packages/{packageId}/quantity-split": {
+      "post": {
+        "tags": [
+          "Split Order Package"
+        ],
+        "summary": "Split Packages Based On Barcode - splitShipmentPackageByQuantity",
+        "description": "After using this service, new packages depending on the order number will be generated asynchronously.",
+        "operationId": "splitShipmentPackageByQuantity",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "packageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "quantitySplit"
+                ],
+                "properties": {
+                  "quantitySplit": {
+                    "type": "array",
+                    "description": "Quantity split requests for each order line",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "orderLineId",
+                        "quantities"
+                      ],
+                      "properties": {
+                        "orderLineId": {
+                          "type": "integer",
+                          "format": "int64",
+                          "description": "Order line ID to split"
+                        },
+                        "quantities": {
+                          "type": "array",
+                          "description": "Array of quantities to split into separate packages",
+                          "items": {
+                            "type": "integer",
+                            "minimum": 1
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "newPackageIds": {
+                      "type": "array",
+                      "description": "Array of newly created package IDs",
+                      "items": {
+                        "type": "integer",
+                        "format": "int64"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/order/sellers/{sellerId}/shipment-packages/{packageId}/multi-split": {
+      "post": {
+        "tags": [
+          "Split Order Package"
+        ],
+        "summary": "Split Multiple Packages - multiSplitShipmentPackage",
+        "description": "After using this service, new packages depending on the order number will be generated asynchronously.",
+        "operationId": "multiSplitShipmentPackage",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "packageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "splitGroups"
+                ],
+                "properties": {
+                  "splitGroups": {
+                    "type": "array",
+                    "description": "Groups of order line IDs to split into separate packages",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "orderLineIds"
+                      ],
+                      "properties": {
+                        "orderLineIds": {
+                          "type": "array",
+                          "description": "Order line IDs to group together in a new package",
+                          "items": {
+                            "type": "integer",
+                            "format": "int64"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "splitGroups": [
+                  {
+                    "orderLineIds": [
+                      3,
+                      5,
+                      6
+                    ]
+                  },
+                  {
+                    "orderLineIds": [
+                      7,
+                      8,
+                      9
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "newPackageId": {
+                            "type": "integer",
+                            "format": "int64"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/order/sellers/{sellerId}/shipment-packages/{packageId}/box-info": {
+      "put": {
+        "tags": [
+          "Order Integration"
+        ],
+        "summary": "Notify Deci and Box Quantity - updateBoxInfo",
+        "description": "With this service, you can feed deci and box quantity for your order packages of UPS Cargo and CEVA Logistics companies.",
+        "operationId": "updateBoxInfo",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "packageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "deci": {
+                    "type": "number",
+                    "format": "double",
+                    "description": "Deci value"
+                  },
+                  "boxQuantity": {
+                    "type": "integer",
+                    "description": "Box Quantity"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/order/sellers/{sellerId}/shipment-packages/{packageId}/alternative-delivery": {
+      "put": {
+        "tags": [
+          "Shipping Alternative Delivery"
+        ],
+        "summary": "Shipping with Cargo Link - processAlternativeDelivery",
+        "description": "After sending the order package, you can feed it with the cargo tracking link or phone number you have. After successfully submitting this request, the order will automatically switch to \"Shipped\" status.",
+        "operationId": "processAlternativeDelivery",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "packageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "isPhoneNumber",
+                  "trackingInfo",
+                  "params"
+                ],
+                "properties": {
+                  "isPhoneNumber": {
+                    "type": "boolean",
+                    "description": "If false, trackingInfo should be a cargo tracking link. If true, trackingInfo should be a phone number.",
+                    "example": false
+                  },
+                  "trackingInfo": {
+                    "type": "string",
+                    "description": "Cargo tracking link (if isPhoneNumber is false) or phone number (if isPhoneNumber is true)",
+                    "example": "http://tex...."
+                  },
+                  "params": {
+                    "type": "object",
+                    "description": "Additional parameters",
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "example": {}
+                  },
+                  "boxQuantity": {
+                    "type": "integer",
+                    "description": "The quantity of the package (optional)",
+                    "example": 1
+                  },
+                  "deci": {
+                    "type": "number",
+                    "format": "float",
+                    "description": "The deci of the package (optional)",
+                    "example": 1.4
+                  }
+                }
+              },
+              "example": {
+                "isPhoneNumber": false,
+                "trackingInfo": "http://tex....",
+                "params": {},
+                "boxQuantity": 1,
+                "deci": 1.4
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/order/sellers/{sellerId}/shipment-packages/{packageId}/alternative-delivery-digital": {
+      "put": {
+        "tags": [
+          "Shipping Alternative Delivery"
+        ],
+        "summary": "Digital Product Delivery with Alternative Delivery - processAlternativeDelivery",
+        "description": "When you call this service, the information you provide will be automatically sent to customers via sms and e-mail.",
+        "operationId": "processAlternativeDeliveryDigital",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "packageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "isPhoneNumber",
+                  "trackingInfo",
+                  "params"
+                ],
+                "properties": {
+                  "isPhoneNumber": {
+                    "type": "boolean",
+                    "description": "Should be true for digital product delivery",
+                    "example": true
+                  },
+                  "trackingInfo": {
+                    "type": "string",
+                    "description": "Contact phone number for customer",
+                    "example": "5555555555"
+                  },
+                  "params": {
+                    "type": "object",
+                    "description": "Additional parameters including digital code",
+                    "required": [
+                      "digitalCode"
+                    ],
+                    "properties": {
+                      "digitalCode": {
+                        "type": "string",
+                        "description": "Digital code must be between 6-120 characters",
+                        "minLength": 6,
+                        "maxLength": 120,
+                        "example": "AX4567fasdf"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "isPhoneNumber": true,
+                "trackingInfo": "5555555555",
+                "params": {
+                  "digitalCode": "AX4567fasdf"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/order/sellers/{sellerId}/shipment-packages/{packageId}/manual-invoice-delivery": {
+      "put": {
+        "tags": [
+          "Shipping Alternative Delivery"
+        ],
+        "summary": "Manual Delivery by Package Id - manualDeliverByPackageId",
+        "description": "Manual delivery notification by package ID",
+        "operationId": "manualDeliverByPackageId",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "packageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/order/sellers/{sellerId}/shipment-packages/manual-invoice-delivery-by-tracking-number/{cargoTrackingNumber}": {
+      "put": {
+        "tags": [
+          "Shipping Alternative Delivery"
+        ],
+        "summary": "Manual Delivery by Tracking Number - manualDeliverByTrackingNumber",
+        "description": "Manual delivery notification by cargo tracking number",
+        "operationId": "manualDeliverByTrackingNumber",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "cargoTrackingNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/order/sellers/{sellerId}/shipment-packages/manual-return-by-tracking-number/{cargoTrackingNumber}": {
+      "put": {
+        "tags": [
+          "Shipping Alternative Delivery"
+        ],
+        "summary": "Manual Return by Tracking Number - manualReturnByTrackingNumber",
+        "description": "You can use this service for orders that are returned to your warehouse in the case of \"shipped\" status and cannot be delivered to the customer, and therefore cannot be transferred to \"delivered\" status.",
+        "operationId": "manualReturnByTrackingNumber",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "cargoTrackingNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/order/sellers/{sellerId}/shipment-packages/{packageId}/manual-return": {
+      "put": {
+        "tags": [
+          "Shipping Alternative Delivery"
+        ],
+        "summary": "Manual Return by Package Id - manualReturnByPackageId",
+        "description": "You can use this service for orders that are returned to your warehouse in the case of \"shipped\" status and cannot be delivered to the customer, and therefore cannot be transferred to \"delivered\" status.",
+        "operationId": "manualReturnByPackageId",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "packageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/order/sellers/{sellerId}/shipment-packages/{packageId}/delivered-by-service": {
+      "put": {
+        "tags": [
+          "Order Integration"
+        ],
+        "summary": "Delivery By Service - deliveredByService",
+        "description": "Our sellers who ship their products to the authorized service should call this service.",
+        "operationId": "deliveredByService",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "packageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/order/sellers/{sellerId}/shipment-packages/{packageId}/cargo-providers": {
+      "put": {
+        "tags": [
+          "Order Integration"
+        ],
+        "summary": "Change Cargo Provider - changeCargoProvider",
+        "description": "This service is used to change the cargo provides of packages.",
+        "operationId": "changeCargoProvider",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "packageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "cargoProvider"
+                ],
+                "properties": {
+                  "cargoProvider": {
+                    "type": "string",
+                    "description": "Cargo provider code",
+                    "enum": [
+                      "YKMP",
+                      "ARASMP",
+                      "SURATMP",
+                      "HOROZMP",
+                      "DHLECOMMP",
+                      "PTTMP",
+                      "CEVAMP",
+                      "TEXMP",
+                      "UPSMP",
+                      "KOLAYGELSINMP",
+                      "CEVATEDARIK"
+                    ]
+                  }
+                }
+              },
+              "example": {
+                "cargoProvider": "ARASMP"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/order/sellers/{sellerId}/shipment-packages/{packageId}/warehouse": {
+      "put": {
+        "tags": [
+          "Order Integration"
+        ],
+        "summary": "Update Warehouse Information - updateWarehouse",
+        "description": "With this service, the \"WarehouseId\" field returned from the Picking Order Packages service will be updated.",
+        "operationId": "updateWarehouse",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "packageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "warehouseId"
+                ],
+                "properties": {
+                  "warehouseId": {
+                    "type": "integer",
+                    "description": "Warehouse ID"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request (package status not suitable for update - must be Created, Invoiced, or Picking)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/order/sellers/{sellerId}/shipment-packages/{packageId}/extended-agreed-delivery-date": {
+      "put": {
+        "tags": [
+          "Order Integration"
+        ],
+        "summary": "Additional Supply Time Definition - agreedDeliveryDate",
+        "description": "Sellers can define additional supply times for order packages.",
+        "operationId": "extendAgreedDeliveryDate",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "packageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "extendedDayCount"
+                ],
+                "properties": {
+                  "extendedDayCount": {
+                    "type": "integer",
+                    "enum": [
+                      1,
+                      2,
+                      3
+                    ],
+                    "description": "Number of days to extend (can be 1, 2, or 3)"
+                  }
+                }
+              },
+              "example": {
+                "extendedDayCount": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/member/countries": {
+      "get": {
+        "tags": [
+          "Address Information"
+        ],
+        "summary": "Country Information",
+        "description": "You can get the country information from the below service.",
+        "operationId": "getCountries",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "code": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/member/countries/{CountryCode}/cities": {
+      "get": {
+        "tags": [
+          "Address Information"
+        ],
+        "summary": "Get Cities for GULF and CEE Countries",
+        "description": "You can get the city information for the GULF and CEE region from the below service.",
+        "operationId": "getCitiesByCountry",
+        "parameters": [
+          {
+            "name": "CountryCode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Country code from countries endpoint"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/member/countries/{CountryCode}/cities/{cityId}/districts": {
+      "get": {
+        "tags": [
+          "Address Information"
+        ],
+        "summary": "Get Districts for GULF Countries",
+        "description": "You can get the district information for the GULF countries from the below service.",
+        "operationId": "getDistrictsByCity",
+        "parameters": [
+          {
+            "name": "CountryCode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cityId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "City ID from cities endpoint"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/member/countries/domestic/AZ/cities": {
+      "get": {
+        "tags": [
+          "Address Information"
+        ],
+        "summary": "Get Cities for Azerbaijan",
+        "description": "You can get the city information for the Azerbaijan from the below service.",
+        "operationId": "getAzerbaijanCities",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/member/countries/domestic/AZ/cities/{cityCode}/districts": {
+      "get": {
+        "tags": [
+          "Address Information"
+        ],
+        "summary": "Get Districts for Azerbaijan",
+        "description": "You can get the district information for the Azerbaijan from the below service.",
+        "operationId": "getAzerbaijanDistricts",
+        "parameters": [
+          {
+            "name": "cityCode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "City code from Azerbaijan cities endpoint"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/member/countries/domestic/TR/cities": {
+      "get": {
+        "tags": [
+          "Address Information"
+        ],
+        "summary": "Get Cities for Turkey",
+        "description": "You can get the city information for the Turkey from the below service.",
+        "operationId": "getTurkeyCities",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/member/countries/domestic/TR/cities/{CityCode}/districts": {
+      "get": {
+        "tags": [
+          "Address Information"
+        ],
+        "summary": "Get Districts for Turkey",
+        "description": "You can get the district information for the Turkey from the below service.",
+        "operationId": "getTurkeyDistricts",
+        "parameters": [
+          {
+            "name": "CityCode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "City code from Turkey cities endpoint"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/member/countries/domestic/TR/cities/{CityCode}/districts/{DistrictCode}/neighborhoods": {
+      "get": {
+        "tags": [
+          "Address Information"
+        ],
+        "summary": "Get Neighborhoods for Turkey",
+        "description": "You can get the neighborhood information for the Turkey from the below service.",
+        "operationId": "getTurkeyNeighborhoods",
+        "parameters": [
+          {
+            "name": "CityCode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "City code from Turkey cities endpoint"
+          },
+          {
+            "name": "DistrictCode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "District code from Turkey districts endpoint"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/order/sellers/{sellerId}/shipment-packages/{packageId}/labor-costs": {
+      "put": {
+        "tags": [
+          "Order Integration"
+        ],
+        "summary": "Update Labor Cost - laborCosts",
+        "description": "You can use this service to feed the labor cost amount.",
+        "operationId": "updateLaborCosts",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "packageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "orderLineId",
+                    "laborCostPerItem"
+                  ],
+                  "properties": {
+                    "orderLineId": {
+                      "type": "integer",
+                      "format": "int64"
+                    },
+                    "laborCostPerItem": {
+                      "type": "number",
+                      "format": "double",
+                      "description": "Labor cost per single item"
+                    }
+                  }
+                }
+              },
+              "example": [
+                {
+                  "orderLineId": 3653527482,
+                  "laborCostPerItem": 32.12
+                },
+                {
+                  "orderLineId": 3653527483,
+                  "laborCostPerItem": 78.65
+                }
+              ]
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/order/sellers/{sellerId}/claims": {
+      "get": {
+        "tags": [
+          "Returned Orders Integration"
+        ],
+        "summary": "Getting Returned Orders - getClaims",
+        "description": "This method enables you to retrieve information about returned orders from the Trendyol system.",
+        "operationId": "getClaims",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "maximum": 200
+            }
+          },
+          {
+            "name": "claimItemStatus",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Created",
+                "WaitingInAction",
+                "WaitingFraudCheck",
+                "Accepted",
+                "Unresolved",
+                "Rejected",
+                "Cancelled",
+                "InAnalysis"
+              ]
+            }
+          },
+          {
+            "name": "orderNumber",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The order number of the claim package"
+          },
+          {
+            "name": "claimIds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int64"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "totalElements": {
+                      "type": "integer",
+                      "description": "Total number of elements"
+                    },
+                    "totalPages": {
+                      "type": "integer",
+                      "description": "Total number of pages"
+                    },
+                    "page": {
+                      "type": "integer",
+                      "description": "Current page number"
+                    },
+                    "size": {
+                      "type": "integer",
+                      "description": "Page size"
+                    },
+                    "content": {
+                      "type": "array",
+                      "description": "Array of claim objects",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Claim ID"
+                          },
+                          "claimId": {
+                            "type": "string",
+                            "description": "Claim ID"
+                          },
+                          "orderNumber": {
+                            "type": "string",
+                            "description": "Order number"
+                          },
+                          "orderDate": {
+                            "type": "integer",
+                            "format": "int64",
+                            "description": "Order date (timestamp)"
+                          },
+                          "customerFirstName": {
+                            "type": "string",
+                            "description": "Customer first name"
+                          },
+                          "customerLastName": {
+                            "type": "string",
+                            "description": "Customer last name"
+                          },
+                          "claimDate": {
+                            "type": "integer",
+                            "format": "int64",
+                            "description": "Claim date (timestamp in GMT)"
+                          },
+                          "cargoTrackingNumber": {
+                            "type": "integer",
+                            "format": "int64",
+                            "description": "Cargo tracking number"
+                          },
+                          "cargoTrackingLink": {
+                            "type": "string",
+                            "description": "Cargo tracking link"
+                          },
+                          "cargoSenderNumber": {
+                            "type": "string",
+                            "description": "Cargo sender number"
+                          },
+                          "cargoProviderName": {
+                            "type": "string",
+                            "description": "Cargo provider name"
+                          },
+                          "orderShipmentPackageId": {
+                            "type": "integer",
+                            "format": "int64",
+                            "description": "Order shipment package ID"
+                          },
+                          "replacementOutboundpackageinfo": {
+                            "type": "object",
+                            "description": "Replacement outbound package information (empty if no replacement)",
+                            "properties": {
+                              "cargoTrackingNumber": {
+                                "type": "integer",
+                                "format": "int64"
+                              },
+                              "cargoProviderName": {
+                                "type": "string"
+                              },
+                              "cargoSenderNumber": {
+                                "type": "string"
+                              },
+                              "cargoTrackingLink": {
+                                "type": "string"
+                              },
+                              "packageid": {
+                                "type": "integer",
+                                "format": "int64",
+                                "description": "Replacement packet ID information"
+                              },
+                              "items": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                },
+                                "description": "Array of claim item IDs"
+                              }
+                            }
+                          },
+                          "rejectedpackageinfo": {
+                            "type": "object",
+                            "description": "Rejected package information (if available)",
+                            "properties": {
+                              "cargoTrackingNumber": {
+                                "type": "integer",
+                                "format": "int64"
+                              },
+                              "cargoSenderNumber": {
+                                "type": "string"
+                              },
+                              "cargoProviderName": {
+                                "type": "string"
+                              },
+                              "cargoTrackingLink": {
+                                "type": "string"
+                              },
+                              "packageid": {
+                                "type": "integer",
+                                "format": "int64",
+                                "description": "Rejected return package ID"
+                              },
+                              "items": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                },
+                                "description": "Array of claim item IDs"
+                              },
+                              "dontShipBack": {
+                                "type": "boolean",
+                                "description": "Indicates that the product should not be shipped back"
+                              }
+                            }
+                          },
+                          "items": {
+                            "type": "array",
+                            "description": "Array of order line items",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "orderLine": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "integer",
+                                      "format": "int64"
+                                    },
+                                    "productName": {
+                                      "type": "string"
+                                    },
+                                    "barcode": {
+                                      "type": "string"
+                                    },
+                                    "merchantSku": {
+                                      "type": "string"
+                                    },
+                                    "productColor": {
+                                      "type": "string"
+                                    },
+                                    "productSize": {
+                                      "type": "string"
+                                    },
+                                    "price": {
+                                      "type": "number",
+                                      "format": "double"
+                                    },
+                                    "vatBaseAmount": {
+                                      "type": "number",
+                                      "format": "double"
+                                    },
+                                    "vatRate": {
+                                      "type": "number",
+                                      "format": "double"
+                                    },
+                                    "salesCampaignId": {
+                                      "type": "integer",
+                                      "format": "int64"
+                                    },
+                                    "productCategory": {
+                                      "type": "string"
+                                    }
+                                  }
+                                },
+                                "claimItems": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "id": {
+                                        "type": "string",
+                                        "description": "Claim line item ID"
+                                      },
+                                      "orderLineItemId": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                      },
+                                      "customerClaimItemReason": {
+                                        "type": "object",
+                                        "properties": {
+                                          "name": {
+                                            "type": "string"
+                                          },
+                                          "externalReasonId": {
+                                            "type": "integer"
+                                          },
+                                          "code": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "trendyolClaimItemReason": {
+                                        "type": "object",
+                                        "properties": {
+                                          "name": {
+                                            "type": "string"
+                                          },
+                                          "externalReasonId": {
+                                            "type": "integer"
+                                          },
+                                          "code": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "claimItemStatus": {
+                                        "type": "object",
+                                        "properties": {
+                                          "name": {
+                                            "type": "string",
+                                            "description": "Status name"
+                                          }
+                                        }
+                                      },
+                                      "note": {
+                                        "type": "string"
+                                      },
+                                      "customerNote": {
+                                        "type": "string"
+                                      },
+                                      "resolved": {
+                                        "type": "boolean"
+                                      },
+                                      "autoAccepted": {
+                                        "type": "boolean",
+                                        "description": "Returns which are waiting in actions for 48 hours are automatically accepted by the system"
+                                      },
+                                      "acceptedBySeller": {
+                                        "type": "boolean",
+                                        "description": "Returns accepted by the seller"
+                                      },
+                                      "acceptDetail": {
+                                        "type": "string",
+                                        "description": "SUPPLIER, DISPUTE, or SYSTEM"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "lastModifiedDate": {
+                            "type": "integer",
+                            "format": "int64",
+                            "description": "Last modified date (timestamp)"
+                          },
+                          "orderOutboundPackageId": {
+                            "type": "integer",
+                            "format": "int64",
+                            "description": "Order outbound package ID"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "totalElements": 2099,
+                  "totalPages": 2099,
+                  "page": 0,
+                  "size": 1,
+                  "content": [
+                    {
+                      "id": "f9da2317-876b-4b86-b8f7-0535c3b65731",
+                      "claimId": "f9da2317-876b-4b86-b8f7-0535c3b65731",
+                      "orderNumber": "65745805",
+                      "orderDate": 1524826343886,
+                      "customerFirstName": "John",
+                      "customerLastName": "Doe",
+                      "claimDate": 1525844162827,
+                      "cargoTrackingNumber": 72602420957047276000,
+                      "cargoTrackingLink": "https://kargotakip.araskargo.com.tr/mainpage.aspx?code=90909090909",
+                      "cargoSenderNumber": "8106459254413",
+                      "cargoProviderName": "Aras Kargo Marketplace",
+                      "orderShipmentPackageId": 3853354,
+                      "replacementOutboundpackageinfo": {
+                        "cargoTrackingNumber": 72602420957047276000,
+                        "cargoProviderName": "Aras Kargo Marketplace",
+                        "cargoSenderNumber": "733861966410",
+                        "cargoTrackingLink": "https://kargotakip.araskargo.com.tr/mainpage.aspx?code=90909090909",
+                        "packageid": 28717254,
+                        "items": [
+                          "b71461e3-d1a0-4c1d-9a6d-18ecbcb5432d"
+                        ]
+                      },
+                      "rejectedpackageinfo": {
+                        "cargoTrackingNumber": 72602420957047276000,
+                        "cargoSenderNumber": "12345754875355",
+                        "cargoProviderName": "Aras Kargo Marketplace",
+                        "cargoTrackingLink": "https://kargotakip.araskargo.com.tr/mainpage.aspx?code=90909090909",
+                        "packageid": 28717254,
+                        "items": [
+                          "b71461e3-d1a0-4c1d-9a6d-18ecbcb5432d"
+                        ],
+                        "dontShipBack": false
+                      },
+                      "items": [
+                        {
+                          "orderLine": {
+                            "id": 28717254,
+                            "productName": "Erkek Bebek Sandalet 8S5280Z1/GREEN CS4, 21",
+                            "barcode": "99999999999",
+                            "merchantSku": "2083667",
+                            "productColor": "GREEN CS4",
+                            "productSize": " 21",
+                            "price": 12.95,
+                            "vatBaseAmount": 8,
+                            "vatRate": 8,
+                            "salesCampaignId": 183631,
+                            "productCategory": "Sandalet"
+                          },
+                          "claimItems": [
+                            {
+                              "id": "b71461e3-d1a0-4c1d-9a6d-18ecbcb5158c",
+                              "orderLineItemId": 29815493,
+                              "customerClaimItemReason": {
+                                "name": "Beden uymama",
+                                "externalReasonId": 23,
+                                "code": "UNFIT"
+                              },
+                              "trendyolClaimItemReason": {
+                                "name": "Beden uymama",
+                                "externalReasonId": 23,
+                                "code": "UNFIT"
+                              },
+                              "claimItemStatus": {
+                                "name": "Created"
+                              },
+                              "note": "",
+                              "customerNote": "Customer note",
+                              "resolved": false,
+                              "autoAccepted": false,
+                              "acceptedBySeller": true,
+                              "acceptDetail": "SUPPLIER"
+                            }
+                          ]
+                        },
+                        {
+                          "orderLine": {
+                            "id": 28717255,
+                            "productName": "Erkek Bebek Soket Çorap 4'lü 8S7346Z1/MIX YARN DYED K00, 6-12 Ay",
+                            "barcode": "99999999999",
+                            "merchantSku": "2052551",
+                            "productColor": "MIX YARN DYED K00",
+                            "productSize": " 17-18 (6-12 Ay)",
+                            "price": 9.95,
+                            "vatBaseAmount": 8,
+                            "vatRate": 8,
+                            "salesCampaignId": 183631,
+                            "productCategory": "Çorap"
+                          },
+                          "claimItems": [
+                            {
+                              "id": "b71461e3-d1a0-4c1d-9a6d-18ecbcb5432d",
+                              "orderLineItemId": 29815494,
+                              "customerClaimItemReason": {
+                                "name": "Beden uymama",
+                                "externalReasonId": 23,
+                                "code": "UNFIT"
+                              },
+                              "trendyolClaimItemReason": {
+                                "name": "Beden uymama",
+                                "externalReasonId": 23,
+                                "code": "UNFIT"
+                              },
+                              "claimItemStatus": {
+                                "name": "Created"
+                              },
+                              "note": "",
+                              "customerNote": "Customer note",
+                              "resolved": false,
+                              "autoAccepted": false,
+                              "acceptedBySeller": true,
+                              "acceptDetail": "SUPPLIER"
+                            }
+                          ]
+                        }
+                      ],
+                      "lastModifiedDate": 1723275767111,
+                      "orderOutboundPackageId": 58835111
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/order/sellers/{sellerId}/claims/create": {
+      "post": {
+        "tags": [
+          "Returned Orders Integration"
+        ],
+        "summary": "Create a Return Request - createClaim",
+        "description": "You can use it to create return request packages for order packages that arrive without a return code.",
+        "operationId": "createClaim",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "claimItems",
+                  "orderNumber"
+                ],
+                "properties": {
+                  "claimItems": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "barcode",
+                        "quantity",
+                        "reasonId"
+                      ],
+                      "properties": {
+                        "barcode": {
+                          "type": "string",
+                          "description": "It is the barcode information of the product in the order.",
+                          "example": "string"
+                        },
+                        "customerNote": {
+                          "type": "string",
+                          "description": "It is the field written by customers. If you wish, you can feed this field with a text such as \"Return without return code\".",
+                          "example": "string"
+                        },
+                        "quantity": {
+                          "type": "integer",
+                          "description": "It is the quantity information of the product you want to create a return request.",
+                          "example": 0
+                        },
+                        "reasonId": {
+                          "type": "integer",
+                          "description": "These are the reasons for return selected by customers on trendyol.com. You can feed this id value as \"I give up\" with 401 id value for now.",
+                          "example": 401
+                        }
+                      }
+                    }
+                  },
+                  "customerId": {
+                    "type": "integer",
+                    "format": "int64",
+                    "description": "It is the id value of the customer who take the order on Trendyol.",
+                    "example": 0
+                  },
+                  "excludeListing": {
+                    "type": "boolean",
+                    "description": "Exclude from listing",
+                    "example": true
+                  },
+                  "forcePackageCreation": {
+                    "type": "boolean",
+                    "description": "Force package creation",
+                    "example": true
+                  },
+                  "orderNumber": {
+                    "type": "string",
+                    "description": "The number of the order.",
+                    "example": "string"
+                  },
+                  "shipmentCompanyId": {
+                    "type": "integer",
+                    "description": "You can use the id value of the cargo company you have worked with.",
+                    "example": 4
+                  }
+                }
+              },
+              "example": {
+                "claimItems": [
+                  {
+                    "barcode": "string",
+                    "customerNote": "string",
+                    "quantity": 0,
+                    "reasonId": 401
+                  }
+                ],
+                "customerId": 888888888,
+                "excludeListing": true,
+                "forcePackageCreation": true,
+                "orderNumber": "string",
+                "shipmentCompanyId": 4
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "claimId": {
+                      "type": "string",
+                      "description": "The created claim ID"
+                    },
+                    "cargoTrackingNumber": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "Cargo tracking number for the return"
+                    },
+                    "claimItemIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Array of created claim item IDs"
+                    }
+                  }
+                },
+                "example": {
+                  "claimId": "string",
+                  "cargoTrackingNumber": "733xxxxxxx",
+                  "claimItemIds": [
+                    "string"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/order/sellers/{sellerId}/claims/{claimId}/items/approve": {
+      "put": {
+        "tags": [
+          "Returned Orders Integration"
+        ],
+        "summary": "Approve Returned Orders - approveClaimLineItems",
+        "description": "In Trendyol system, you can confirm the return orders that are returned to your warehouse by means of this method.",
+        "operationId": "approveClaimLineItems",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "claimId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Claim ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "claimLineItemIdList"
+                ],
+                "properties": {
+                  "claimLineItemIdList": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Array of claim line item IDs to approve"
+                  },
+                  "params": {
+                    "type": "object",
+                    "description": "Additional parameters",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "claimLineItemIdList": [
+                  "f9da2317-876b-4b86-b8f7-0535c3b65731"
+                ],
+                "params": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/order/sellers/{sellerId}/claims/{claimId}/issue": {
+      "post": {
+        "tags": [
+          "Returned Orders Integration"
+        ],
+        "summary": "Create a Rejection Request on Returned Orders - createClaimIssue",
+        "description": "In Trendyol system, you can create a rejection request for returned orders in your warehouse.\nYou can attach files related to the return (pdf, jpeg, etc.) as \"form-data (file)\".\n",
+        "operationId": "createClaimIssue",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Seller ID"
+          },
+          {
+            "name": "claimId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Claim ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "claimIssueReasonId",
+                  "claimItemIdList",
+                  "description"
+                ],
+                "properties": {
+                  "claimIssueReasonId": {
+                    "type": "integer",
+                    "format": "int64",
+                    "description": "Claim issue reason ID"
+                  },
+                  "claimItemIdList": {
+                    "type": "string",
+                    "description": "Comma-separated list of claim item IDs"
+                  },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 500,
+                    "description": "Description of the rejection"
+                  },
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    },
+                    "description": "Attachments (pdf, jpeg, etc.)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/order/claim-issue-reasons": {
+      "get": {
+        "tags": [
+          "Returned Orders Integration"
+        ],
+        "summary": "Claim Issue Reasons - getClaimIssueReasons",
+        "description": "You can access the claimIssueReasonId value to be sent to the createClaimIssue service by using this service.",
+        "operationId": "getClaimIssueReasons",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "description": "Reason ID"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "Reason name in Turkish"
+                      }
+                    }
+                  }
+                },
+                "example": [
+                  {
+                    "id": 1,
+                    "name": "İade gelen ürün sahte"
+                  },
+                  {
+                    "id": 51,
+                    "name": "İade gelen ürün kullanılmış"
+                  },
+                  {
+                    "id": 201,
+                    "name": "İade gelen ürün yanlış"
+                  },
+                  {
+                    "id": 251,
+                    "name": "İade gelen ürün defolu / zarar görmüş"
+                  },
+                  {
+                    "id": 401,
+                    "name": "Eksik ürün"
+                  },
+                  {
+                    "id": 101,
+                    "name": "Fazla ürün"
+                  },
+                  {
+                    "id": 151,
+                    "name": "Ürünün bir parçası / aksesuarı eksik"
+                  },
+                  {
+                    "id": 301,
+                    "name": "Ürün bana ait değil"
+                  },
+                  {
+                    "id": 351,
+                    "name": "İade paketi boş geldi"
+                  },
+                  {
+                    "id": 1651,
+                    "name": "İade paketi elime ulaşmadı"
+                  },
+                  {
+                    "id": 1701,
+                    "name": "Ürün yanlış değil"
+                  },
+                  {
+                    "id": 1751,
+                    "name": "Ürün kusurlu değil"
+                  },
+                  {
+                    "id": 451,
+                    "name": "Diğer"
+                  }
+                ]
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/order/sellers/{sellerId}/claims/items/{claimItemsId}/audit": {
+      "get": {
+        "tags": [
+          "Returned Orders Integration"
+        ],
+        "summary": "Get Claim Audit Information - getClaimItemAudits",
+        "description": "With this service, you can check the status progress of the returned order, the update date, the person who made the transaction.",
+        "operationId": "getClaimItemAudits",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "claimItemsId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Claim item ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "claimId": {
+                        "type": "string",
+                        "description": "Claim ID"
+                      },
+                      "claimItemId": {
+                        "type": "string",
+                        "description": "Claim item ID"
+                      },
+                      "previousStatus": {
+                        "type": "string",
+                        "description": "Previous status of the claim item"
+                      },
+                      "newStatus": {
+                        "type": "string",
+                        "description": "New status of the claim item"
+                      },
+                      "userInfoDocument": {
+                        "type": "object",
+                        "properties": {
+                          "executorId": {
+                            "type": "string",
+                            "description": "Executor ID"
+                          },
+                          "executorApp": {
+                            "type": "string",
+                            "description": "Shows from which platform the transaction was made"
+                          },
+                          "executorUser": {
+                            "type": "string",
+                            "description": "Shows which user the action was taken by"
+                          }
+                        }
+                      },
+                      "date": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Update date timestamp"
+                      }
+                    }
+                  }
+                },
+                "example": [
+                  {
+                    "claimId": "6101ceca-1743-4d4e-bad2-d476c22542ca",
+                    "claimItemId": "f369b0a2-1461-4c9c-b3cc-12824d65e5e6",
+                    "previousStatus": "",
+                    "newStatus": "Created",
+                    "userInfoDocument": {
+                      "executorId": "328e8073-d898-11eb-b199-d6f52af37563",
+                      "executorApp": "Seller Center Orders BFF",
+                      "executorUser": 6666666
+                    },
+                    "date": 1624943376430
+                  },
+                  {
+                    "claimId": "6101ceca-1743-4d4e-bad2-d476c22542ca",
+                    "claimItemId": "f369b0a2-1461-4c9c-b3cc-12824d65e5e6",
+                    "previousStatus": "WaitingInAction",
+                    "newStatus": "Accepted",
+                    "userInfoDocument": {
+                      "executorId": "41038394-d898-11eb-9b23-caa176587e6c",
+                      "executorApp": "SellerIntegrationApi",
+                      "executorUser": 6666666
+                    },
+                    "date": 1624943400249
+                  },
+                  {
+                    "claimId": "6101ceca-1743-4d4e-bad2-d476c22542ca",
+                    "claimItemId": "f369b0a2-1461-4c9c-b3cc-12824d65e5e6",
+                    "previousStatus": "Created",
+                    "newStatus": "WaitingInAction",
+                    "userInfoDocument": {
+                      "executorId": "328e8073-d898-11eb-b199-d6f52af37563",
+                      "executorApp": "Seller Center Orders BFF",
+                      "executorUser": 6666666
+                    },
+                    "date": 1624943381690
+                  }
+                ]
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Seller API Key and API Secret with Basic Auth"
+      },
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Bearer token authentication"
+      }
+    },
+    "schemas": {
+      "ShipmentPackage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Package ID"
+          },
+          "shipmentNumber": {
+            "type": "string",
+            "description": "Shipment number"
+          },
+          "orderNumber": {
+            "type": "string",
+            "description": "Order number"
+          },
+          "grossAmount": {
+            "type": "number",
+            "format": "double",
+            "description": "Gross amount"
+          },
+          "totalDiscount": {
+            "type": "number",
+            "format": "double",
+            "description": "Total discount"
+          },
+          "totalTyDiscount": {
+            "type": "number",
+            "format": "double",
+            "description": "Total Trendyol discount"
+          },
+          "taxNumber": {
+            "type": "string",
+            "description": "Tax number"
+          },
+          "invoiceAddress": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "customerFirstName": {
+            "type": "string"
+          },
+          "customerLastName": {
+            "type": "string"
+          },
+          "customerEmail": {
+            "type": "string"
+          },
+          "customerId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "customerTckn": {
+            "type": "string",
+            "description": "Customer TCKN"
+          },
+          "shipmentAddress": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "shipmentPackageStatus": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Created",
+              "Picking",
+              "Invoiced",
+              "Shipped",
+              "Cancelled",
+              "Delivered",
+              "UnDelivered",
+              "Returned"
+            ]
+          },
+          "deliveryType": {
+            "type": "string"
+          },
+          "timeSlotId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "estimatedDeliveryStartDate": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "estimatedDeliveryEndDate": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "agreedDeliveryDate": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "agreedDeliveryDateExtendible": {
+            "type": "boolean"
+          },
+          "agreedDeliveryExtensionStartDate": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "agreedDeliveryExtensionEndDate": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "extendedAgreedDeliveryDate": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "deci": {
+            "type": "number",
+            "format": "double"
+          },
+          "cargoTrackingNumber": {
+            "type": "string"
+          },
+          "cargoTrackingLink": {
+            "type": "string"
+          },
+          "cargoSenderNumber": {
+            "type": "string"
+          },
+          "cargoProviderName": {
+            "type": "string"
+          },
+          "cargoProviderId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderLine"
+            }
+          },
+          "packageHistory": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "createdDate": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "status": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "warehouseId": {
+            "type": "integer"
+          }
+        }
+      },
+      "OrderLine": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "productSize": {
+            "type": "string"
+          },
+          "productColor": {
+            "type": "string"
+          },
+          "merchantSku": {
+            "type": "string"
+          },
+          "productName": {
+            "type": "string"
+          },
+          "productCode": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "merchantId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          },
+          "discount": {
+            "type": "number",
+            "format": "double"
+          },
+          "tyDiscount": {
+            "type": "number",
+            "format": "double"
+          },
+          "currencyCode": {
+            "type": "string"
+          },
+          "productCategory": {
+            "type": "string"
+          },
+          "shipmentType": {
+            "type": "string"
+          },
+          "gift": {
+            "type": "boolean"
+          },
+          "fastDelivery": {
+            "type": "boolean"
+          },
+          "fastDeliveryType": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "vatBaseAmount": {
+            "type": "number",
+            "format": "double"
+          },
+          "barcode": {
+            "type": "string"
+          },
+          "orderLineItemStatusName": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "fastDeliveryOptions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "salesCampaignId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "productSellerCode": {
+            "type": "string"
+          },
+          "deliveryFeeType": {
+            "type": "string"
+          },
+          "laborCostPerItem": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "Address": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "address1": {
+            "type": "string"
+          },
+          "address2": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "cityCode": {
+            "type": "integer"
+          },
+          "district": {
+            "type": "string"
+          },
+          "districtId": {
+            "type": "integer"
+          },
+          "postalCode": {
+            "type": "string"
+          },
+          "countryCode": {
+            "type": "string"
+          },
+          "neighborhoodId": {
+            "type": "integer"
+          },
+          "neighborhood": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "fullAddress": {
+            "type": "string"
+          }
+        }
+      },
+      "Claim": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "customerFirstName": {
+            "type": "string"
+          },
+          "customerLastName": {
+            "type": "string"
+          },
+          "customerId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "orderNumber": {
+            "type": "string"
+          },
+          "orderDate": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "createdDate": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "lastModifiedDate": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "orderLineId": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "productName": {
+                  "type": "string"
+                },
+                "productSize": {
+                  "type": "string"
+                },
+                "productColor": {
+                  "type": "string"
+                },
+                "barcode": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "customerNote": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}

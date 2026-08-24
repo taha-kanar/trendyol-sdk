@@ -1,0 +1,614 @@
+{
+  "components": {
+    "schemas": {
+      "Address": {
+        "properties": {
+          "company": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          },
+          "countyId": {
+            "type": "integer",
+            "format": "int64",
+            "x-observed": "2026-08-24"
+          },
+          "countyName": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          },
+          "shortAddress": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          },
+          "stateName": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          },
+          "addressLines": {
+            "type": "object",
+            "properties": {
+              "addressLine1": {
+                "type": "string"
+              },
+              "addressLine2": {
+                "type": "string"
+              }
+            },
+            "x-observed": "2026-08-24"
+          },
+          "phone": {
+            "nullable": true,
+            "x-observed": "2026-08-24"
+          },
+          "sector": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          },
+          "taxOffice": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          },
+          "taxNumber": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          },
+          "isEInvoiceAvailable": {
+            "type": "boolean",
+            "x-observed": "2026-08-24"
+          }
+        }
+      },
+      "ShipmentPackage": {
+        "properties": {
+          "orderCountryCode": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          },
+          "packageGrossAmount": {
+            "type": "number",
+            "format": "double",
+            "x-observed": "2026-08-24"
+          },
+          "packageSellerDiscount": {
+            "type": "number",
+            "format": "double",
+            "x-observed": "2026-08-24"
+          },
+          "packageTyDiscount": {
+            "type": "integer",
+            "format": "int64",
+            "x-observed": "2026-08-24"
+          },
+          "packageTotalDiscount": {
+            "type": "number",
+            "format": "double",
+            "x-observed": "2026-08-24"
+          },
+          "discountDisplays": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "displayName": {
+                  "type": "string"
+                },
+                "discountAmount": {
+                  "type": "number",
+                  "format": "double"
+                }
+              }
+            },
+            "x-observed": "2026-08-24"
+          },
+          "supplierId": {
+            "type": "integer",
+            "format": "int64",
+            "x-observed": "2026-08-24"
+          },
+          "channelId": {
+            "type": "integer",
+            "format": "int64",
+            "x-observed": "2026-08-24"
+          },
+          "shipmentPackageId": {
+            "type": "integer",
+            "format": "int64",
+            "x-observed": "2026-08-24"
+          },
+          "cargoTrackingNumber": {
+            "type": "integer",
+            "format": "int64",
+            "x-observed": "2026-08-24",
+            "x-observed-note": "Spec declares string; the API returns number."
+          },
+          "sellerDeliveryMethod": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          },
+          "sellerOtpCode": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          },
+          "orderDate": {
+            "type": "integer",
+            "format": "int64",
+            "x-observed": "2026-08-24"
+          },
+          "identityNumber": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          },
+          "currencyCode": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          },
+          "packageHistories": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "createdDate": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "status": {
+                  "type": "string"
+                }
+              }
+            },
+            "x-observed": "2026-08-24"
+          },
+          "packageTotalPrice": {
+            "type": "number",
+            "format": "double",
+            "x-observed": "2026-08-24"
+          },
+          "deliveryAddressType": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          },
+          "fastDelivery": {
+            "type": "boolean",
+            "x-observed": "2026-08-24"
+          },
+          "originShipmentDate": {
+            "type": "integer",
+            "format": "int64",
+            "x-observed": "2026-08-24"
+          },
+          "lastModifiedDate": {
+            "type": "integer",
+            "format": "int64",
+            "x-observed": "2026-08-24"
+          },
+          "commercial": {
+            "type": "boolean",
+            "x-observed": "2026-08-24"
+          },
+          "fastDeliveryType": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          },
+          "deliveredByService": {
+            "type": "boolean",
+            "x-observed": "2026-08-24"
+          },
+          "invoiceStatus": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          },
+          "invoiceNumber": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          },
+          "micro": {
+            "type": "boolean",
+            "x-observed": "2026-08-24"
+          },
+          "giftBoxRequested": {
+            "type": "boolean",
+            "x-observed": "2026-08-24"
+          },
+          "3pByTrendyol": {
+            "type": "boolean",
+            "x-observed": "2026-08-24"
+          },
+          "containsDangerousProduct": {
+            "type": "boolean",
+            "x-observed": "2026-08-24"
+          },
+          "isCod": {
+            "type": "boolean",
+            "x-observed": "2026-08-24"
+          },
+          "createdBy": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          },
+          "originPackageIds": {
+            "nullable": true,
+            "x-observed": "2026-08-24"
+          },
+          "shipmentNumber": {
+            "type": "integer",
+            "format": "int64",
+            "x-observed": "2026-08-24",
+            "x-observed-note": "Spec declares string; the API returns number."
+          },
+          "is4P": {
+            "type": "boolean",
+            "x-observed": "2026-08-24"
+          },
+          "invoiceLink": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          },
+          "cargoDeci": {
+            "type": "integer",
+            "format": "int64",
+            "x-observed": "2026-08-24"
+          }
+        }
+      },
+      "OrderLine": {
+        "properties": {
+          "stockCode": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          },
+          "contentId": {
+            "type": "integer",
+            "format": "int64",
+            "x-observed": "2026-08-24"
+          },
+          "sellerId": {
+            "type": "integer",
+            "format": "int64",
+            "x-observed": "2026-08-24"
+          },
+          "lineGrossAmount": {
+            "type": "number",
+            "format": "double",
+            "x-observed": "2026-08-24"
+          },
+          "lineTotalDiscount": {
+            "type": "number",
+            "format": "double",
+            "x-observed": "2026-08-24"
+          },
+          "lineSellerDiscount": {
+            "type": "number",
+            "format": "double",
+            "x-observed": "2026-08-24"
+          },
+          "lineTyDiscount": {
+            "type": "integer",
+            "format": "int64",
+            "x-observed": "2026-08-24"
+          },
+          "discountDetails": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "lineItemPrice": {
+                  "type": "number",
+                  "format": "double"
+                },
+                "lineItemDiscount": {
+                  "type": "number",
+                  "format": "double"
+                },
+                "lineItemSellerDiscount": {
+                  "type": "number",
+                  "format": "double"
+                },
+                "lineItemTyDiscount": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            },
+            "x-observed": "2026-08-24"
+          },
+          "lineId": {
+            "type": "integer",
+            "format": "int64",
+            "x-observed": "2026-08-24"
+          },
+          "vatRate": {
+            "type": "integer",
+            "format": "int64",
+            "x-observed": "2026-08-24"
+          },
+          "lineUnitPrice": {
+            "type": "number",
+            "format": "double",
+            "x-observed": "2026-08-24"
+          },
+          "productCategoryId": {
+            "type": "integer",
+            "format": "int64",
+            "x-observed": "2026-08-24"
+          },
+          "commission": {
+            "type": "integer",
+            "format": "int64",
+            "x-observed": "2026-08-24"
+          },
+          "businessUnit": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          },
+          "defectiveClaimListingInsight": {
+            "type": "string",
+            "x-observed": "2026-08-24"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/order/sellers/{sellerId}/claims": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "channelId": {
+                            "type": "integer",
+                            "format": "int64",
+                            "x-observed": "2026-08-24"
+                          },
+                          "rejectedPackageInfo": {
+                            "type": "object",
+                            "properties": {
+                              "cargoTrackingNumber": {
+                                "type": "integer",
+                                "format": "int64"
+                              },
+                              "packageId": {
+                                "type": "integer",
+                                "format": "int64"
+                              },
+                              "cargoProviderName": {
+                                "type": "string"
+                              },
+                              "cargoTrackingLink": {
+                                "type": "string"
+                              },
+                              "items": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "cargoSenderNumber": {
+                                "type": "string"
+                              },
+                              "dontShipBack": {
+                                "type": "boolean"
+                              },
+                              "sellerOtp": {
+                                "type": "string"
+                              },
+                              "sellerDeliveryMethod": {
+                                "type": "string"
+                              }
+                            },
+                            "x-observed": "2026-08-24"
+                          },
+                          "items": {
+                            "items": {
+                              "properties": {
+                                "orderLine": {
+                                  "properties": {
+                                    "lineItems": {
+                                      "nullable": true,
+                                      "x-observed": "2026-08-24"
+                                    }
+                                  }
+                                },
+                                "claimItems": {
+                                  "items": {
+                                    "properties": {
+                                      "customerClaimItemReason": {
+                                        "properties": {
+                                          "id": {
+                                            "type": "integer",
+                                            "format": "int64",
+                                            "x-observed": "2026-08-24"
+                                          }
+                                        }
+                                      },
+                                      "trendyolClaimItemReason": {
+                                        "properties": {
+                                          "id": {
+                                            "type": "integer",
+                                            "format": "int64",
+                                            "x-observed": "2026-08-24"
+                                          }
+                                        }
+                                      },
+                                      "autoApproveDate": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "x-observed": "2026-08-24"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "sellerOtp": {
+                            "type": "string",
+                            "x-observed": "2026-08-24"
+                          },
+                          "sellerDeliveryMethod": {
+                            "type": "string",
+                            "x-observed": "2026-08-24"
+                          },
+                          "sellerCollectionPointDetails": {
+                            "type": "object",
+                            "properties": {
+                              "collectionPointId": {
+                                "type": "string"
+                              }
+                            },
+                            "x-observed": "2026-08-24"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/member/countries/domestic/TR/cities": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "code": {
+                        "type": "string",
+                        "x-observed": "2026-08-24"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/member/countries/{CountryCode}/cities": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "primaryName": {
+                        "type": "string",
+                        "x-observed": "2026-08-24"
+                      },
+                      "secondaryName": {
+                        "type": "string",
+                        "x-observed": "2026-08-24"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/member/countries/domestic/TR/cities/{CityCode}/districts": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "code": {
+                        "type": "string",
+                        "x-observed": "2026-08-24"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/member/countries/domestic/TR/cities/{CityCode}/districts/{DistrictCode}/neighborhoods": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "postCode": {
+                        "type": "string",
+                        "x-observed": "2026-08-24"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/member/countries/domestic/AZ/cities": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "code": {
+                        "type": "string",
+                        "x-observed": "2026-08-24"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/member/countries/domestic/AZ/cities/{cityCode}/districts": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "code": {
+                        "type": "string",
+                        "x-observed": "2026-08-24"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

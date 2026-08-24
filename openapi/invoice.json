@@ -1,0 +1,424 @@
+{
+  "openapi": "3.0.3",
+  "x-readme": {
+    "proxy-enabled": false
+  },
+  "info": {
+    "title": "Invoice Integration",
+    "description": "API for Trendyol Seller Invoice Integration - e-Invoice and e-Archive invoice management integration services",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Trendyol Integration Support",
+      "email": "entegrasyon@trendyol.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://apigw.trendyol.com/integration",
+      "description": "Production Environment"
+    },
+    {
+      "url": "https://stageapigw.trendyol.com/integration",
+      "description": "Stage Environment"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Invoice Link Management",
+      "description": "Invoice link sending and deletion operations"
+    },
+    {
+      "name": "Invoice File Management",
+      "description": "Invoice file upload operations"
+    }
+  ],
+  "paths": {
+    "/sellers/{sellerId}/seller-invoice-links": {
+      "post": {
+        "tags": [
+          "Invoice Link Management"
+        ],
+        "summary": "Send Customer Invoice Link - sendInvoiceLink",
+        "description": "Suppliers can send the order's invoice link to Trendyol via this method.\n\n**LEGAL OBLIGATION**: Invoice links sent with this service must be accessible for 8 years as required by law.\n\n### Usage Conditions\n- If you cannot send the invoice for the relevant order by adding a **PDF** to the encrypted mail address in the order, you have to use this service.\n- By triggering this method, Trendyol sends an e-invoice email to Trendyol Customer including the link provided by Supplier.\n- Encrypted mail addresses are not fixed customer-based, unique mail is produced for each order.\n\n### Required Fields\n- The \"invoiceNumber\" and \"invoiceDateTime\" fields will be required for microexport packages but optional for other package types.\n- As of **4 August 2023**, you should send \"invoiceNumber\" and \"invoiceDateTime\" fields as specified.\n\n### Invoice Number Format\nThe invoice number must comply with the following conditions to be valid:\n- First 3 characters: alphanumeric (letter or number)\n- Next 13 characters: numeric\n- Total: 16 characters\n\nFormat: [3 digit(alphanumeric)][13 digit(numeric)]\n\n**Valid Examples:**\n- FRY1234567890123\n- FR11234567890123\n- F1Y1234567890123\n- 1RY1234567890123\n- 12Y1234567890123\n- 1231234567890123\n- F231234567890123\n\n**Invalid Example:**\n- FRY12345 (missing digits)\n\n### Invoice Date Time Format\n- Data type is long\n- Should be greater than 0\n- Must be 10 digits (seconds) or 13 digits (milliseconds)\n",
+        "operationId": "sendInvoiceLink",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Seller ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceLinkRequest"
+              },
+              "example": {
+                "invoiceLink": "https://extfatura.faturaentegratoru.com/324523-34523-52345-3453245.pdf",
+                "shipmentPackageId": 435346,
+                "invoiceDateTime": 1678788898,
+                "invoiceNumber": "TY41234567890123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Success - Invoice link successfully saved"
+          },
+          "400": {
+            "description": "Bad Request - Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict - This error occurs in two situations:\n1. An invoice for the submitted ShipmentPackageId may have already been fed\n2. The submitted link may have already been fed to another ShipmentPackageId before\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sellers/{sellerId}/seller-invoice-links/delete": {
+      "post": {
+        "tags": [
+          "Invoice Link Management"
+        ],
+        "summary": "Delete Customer Invoice Link - deleteInvoiceLink",
+        "description": "Invoices that were fed incorrectly before can be deleted through this service and fed again through the send invoice link service.\n\n### Usage\n- serviceSourceId: represents the shipmentPackageId value\n- channelId: Should always be sent as 1\n- customerId: Can be checked on get order packages service\n",
+        "operationId": "deleteInvoiceLink",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Seller ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceLinkDeleteRequest"
+              },
+              "example": {
+                "serviceSourceId": 88787,
+                "channelId": 1,
+                "customerId": 888888888
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted - Invoice link deletion request accepted"
+          },
+          "400": {
+            "description": "Bad Request - Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Specified invoice link not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sellers/{sellerId}/seller-invoice-file": {
+      "post": {
+        "tags": [
+          "Invoice File Management"
+        ],
+        "summary": "Send Customer Invoice File - uploadInvoiceFile",
+        "description": "Allows sellers to upload invoice files (PDF, JPEG, PNG) for order packages.\n\n### Important Rules\n- The file size cannot exceed 10 MB\n- A future-dated invoice cannot be added\n- Supported file formats: PDF, JPEG, PNG\n- For micro export orders, invoiceDateTime and invoiceNumber are required\n\n### Error Situations\n- If the shipment package belongs to another seller: \"The shipment package does not belong to the specified seller. sellerId: X\"\n- When trying to upload to a package that already has an invoice: \"The invoice for the package number {paketNO} has already been sent\"\n- If package not found: \"The shipment package with the ID {paketNO} could not be found\"\n- Invalid file format: \"File type (.txt) is not supported. Supported file types: application/pdf, image/jpeg, image/png\"\n- If file not sent: \"File not sent. Please select the invoice file and try again\"\n- If invoice number missing for Micro: \"Invoice information is required for Micro export types\"\n- If date missing for Micro: \"Invoice information is required for Micro export types\"\n\n### TR (Turkey) Orders\nThere is no JSON request body. You must send the following fields as form-data:\n- shipmentPackageId: as form-data (Text)\n- file: as form-data (File) - PDF, JPEG, or PNG\n\n### Micro Export Orders\nYou must send the following fields as form-data:\n- shipmentPackageId: as form-data (Text)\n- invoiceDateTime: as form-data (Text) - Unix timestamp (seconds or milliseconds)\n- invoiceNumber: as form-data (Text)\n- file: as form-data (File) - PDF, JPEG, or PNG\n",
+        "operationId": "uploadInvoiceFile",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Seller ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "shipmentPackageId",
+                  "file"
+                ],
+                "properties": {
+                  "shipmentPackageId": {
+                    "type": "integer",
+                    "format": "int64",
+                    "description": "Order package ID (required)"
+                  },
+                  "invoiceDateTime": {
+                    "type": "integer",
+                    "format": "int64",
+                    "description": "Invoice date - Unix timestamp format, greater than 0, 10 digits (seconds) or 13 digits (milliseconds).\nRequired for micro export orders, optional for others.\n"
+                  },
+                  "invoiceNumber": {
+                    "type": "string",
+                    "description": "Invoice number - Required for micro export orders, optional for others.\nFormat rules: First 3 characters alphanumeric, last 13 characters numeric (total 16).\n",
+                    "pattern": "^[A-Za-z0-9]{3}\\d{13}$",
+                    "minLength": 16,
+                    "maxLength": 16
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Invoice file (PDF, JPEG, or PNG format, maximum 10 MB)"
+                  }
+                }
+              },
+              "encoding": {
+                "file": {
+                  "contentType": "application/pdf, image/jpeg, image/png"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success - Invoice file successfully uploaded"
+          },
+          "201": {
+            "description": "Created - Invoice file successfully created"
+          },
+          "400": {
+            "description": "Bad Request - Invalid request parameters. Possible errors:\n- File size exceeds 10 MB\n- Future-dated invoice\n- Invalid file format\n- File not sent\n- Missing information for micro order (invoiceDateTime or invoiceNumber)\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Shipment package does not belong to specified seller",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Specified package ID not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict - Invoice already sent for this package",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Seller API Key and API Secret with Basic Auth"
+      },
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Bearer token authentication"
+      }
+    },
+    "schemas": {
+      "InvoiceLinkRequest": {
+        "type": "object",
+        "required": [
+          "invoiceLink",
+          "shipmentPackageId"
+        ],
+        "properties": {
+          "invoiceLink": {
+            "type": "string",
+            "format": "uri",
+            "description": "e-Invoice or e-Archive invoice link. This link must be accessible for 8 years (legal requirement).\n",
+            "example": "https://extfatura.faturaentegratoru.com/324523-34523-52345-3453245.pdf"
+          },
+          "shipmentPackageId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Trendyol order package ID",
+            "example": 435346
+          },
+          "invoiceDateTime": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Invoice date - Unix timestamp format (seconds or milliseconds).\nShould be greater than 0, 10 digits (seconds) or 13 digits (milliseconds).\nRequired for micro export packages, optional for other package types.\n",
+            "example": 1678788898
+          },
+          "invoiceNumber": {
+            "type": "string",
+            "description": "Invoice number. Required for micro export packages, optional for other package types.\n\nFormat Rules:\n- First 3 characters: alphanumeric (letter or number)\n- Last 13 characters: numeric\n\nTotal 16 characters: [3 alphanumeric][13 numeric]\n",
+            "pattern": "^[A-Za-z0-9]{3}\\d{13}$",
+            "minLength": 16,
+            "maxLength": 16,
+            "example": "TY41234567890123"
+          }
+        }
+      },
+      "InvoiceLinkDeleteRequest": {
+        "type": "object",
+        "required": [
+          "serviceSourceId",
+          "channelId",
+          "customerId"
+        ],
+        "properties": {
+          "serviceSourceId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Order package ID (shipmentPackageId)",
+            "example": 88787
+          },
+          "channelId": {
+            "type": "integer",
+            "description": "Channel ID - Should always be sent as 1",
+            "enum": [
+              1
+            ],
+            "default": 1,
+            "example": 1
+          },
+          "customerId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Customer ID - Can be obtained from get order packages service",
+            "example": 167878
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Error code or type",
+            "example": "CONFLICT"
+          },
+          "message": {
+            "type": "string",
+            "description": "Error message detail",
+            "example": "An invoice for the submitted ShipmentPackageId has already been fed"
+          },
+          "timestamp": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Error timestamp (Unix timestamp)"
+          },
+          "path": {
+            "type": "string",
+            "description": "Endpoint where the error occurred"
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    },
+    {
+      "apiKeyAuth": []
+    }
+  ]
+}
